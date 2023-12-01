@@ -1,0 +1,16 @@
+{{!--
+
+If the user is logged in , and 'GET /protected' endpoint is called, you will render this view based on the specs.
+
+--}}
+<header>        
+    <h1>Habit Tracker</h1>
+</header>
+<p>Welcome {{firstName}} {{lastName}}, to Habit Tracker. The time is now: {{currentTime}} and your role in the system is: <label name="role" id="role" value="{{role}}">{{role}}</label> </p>
+<div id="adminstuff" style="visibility:hidden">You are admin. Click <a href="/admin">here</a> to go to Admin page</div>
+<script type="text/javascript">
+    if (document.getElementById('role').innerHTML==="admin") {
+        document.getElementById('adminstuff').style.visibility="visible";
+    }
+</script>
+<p><a href="/logout">Logout</a></p>
