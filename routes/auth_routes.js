@@ -44,7 +44,8 @@ router
       try {
         const user = await userData.registerUser(firstName, lastName, emailAddress, userPassword, userRole);
         if (user.insertedUser===true) {
-          res.redirect('/login');
+          //res.redirect('/login');
+          res.status(200).render('login', {error: 'You have successfully registered. Use the credentials you just created to login', emailAddress: emailAddress})
         }
         
       } catch (e) {
