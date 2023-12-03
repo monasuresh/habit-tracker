@@ -1,5 +1,5 @@
-import {MongoClient} from 'mongodb';
-import {mongoConfig} from './settings.js';
+import { MongoClient } from 'mongodb';
+import { mongoConfig } from './settings.js';
 
 let _connection = undefined;
 let _db = undefined;
@@ -12,8 +12,9 @@ const dbConnection = async () => {
 
   return _db;
 };
+
 const closeConnection = async () => {
   await _connection.close();
 };
 
-export {dbConnection, closeConnection};
+export { dbConnection, closeConnection };
