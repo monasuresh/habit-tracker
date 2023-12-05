@@ -26,7 +26,7 @@ const getAllTrackedHabits = async (emailAddress) => {
     const userCollection = await users();
     const trackedHabitsList = await userCollection.findOne({ 'emailAddress': emailAddress }, { projection: { _id: 0, trackedHabits: 1 } });
     if (!trackedHabitsList) {
-        throw 'Could not find tracked habits';
+        throw 'Could not find any tracked habits.';
     }
 
     const trackedHabits = trackedHabitsList && trackedHabitsList.trackedHabits ? trackedHabitsList.trackedHabits : [];
@@ -58,7 +58,11 @@ const getAllTrackedHabitsWithNames = async (emailAddress) => {
         for (let trackedHabit of trackedHabits) {
             let habitId = trackedHabit.habitId;
             let globalHabitName = await habitCollection.findOne({ _id: habitId }, { projection: { _id: 0, name: 1 } });
-            console.log(globalHabitName.name);
+
+            if (!globalHabitName) {
+                throw 'There is no globally available habit associated with the tracked habit.';
+            }
+
             habitObject[globalHabitName.name] = trackedHabit;
         }
     }

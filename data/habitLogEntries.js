@@ -2,6 +2,10 @@ import { ObjectId } from 'mongodb';
 import { users } from '../config/mongoCollections.js';
 
 const logHabit = async (emailAddress, trackedHabitID, date, time) => {
+    if (!emailAddress || !trackedHabitID || !date || !time) {
+        throw 'All fields must be supplied';
+    }
+
     let newId = new ObjectId();
 
     const newLogEntry = {

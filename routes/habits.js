@@ -9,7 +9,7 @@ router
     .route('/create-habit')
     .get(async (req, res) => {
         try {
-            return res.render('createHabit', { title: 'Registration Page' });
+            return res.render('createHabit', { title: 'Create Habit' });
         } catch (e) {
             return res.status(500).render('error', { message: e });
         }
@@ -56,9 +56,9 @@ router
 router
     .route('/log-habit')
     .get(async (req, res) => {
-        let emailAddress = req.session.user.emailAddress;
-        let trackedHabitsList = await trackedHabitData.getAllTrackedHabitsWithNames(emailAddress);
         try {
+            let emailAddress = req.session.user.emailAddress;
+        let trackedHabitsList = await trackedHabitData.getAllTrackedHabitsWithNames(emailAddress);
             return res.render('logHabits', { title: 'Log Habits', trackedHabitItems: trackedHabitsList});
         } catch (e) {
             return res.status(404).json({ error: e });
