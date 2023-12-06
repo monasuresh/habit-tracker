@@ -34,3 +34,50 @@ form {
     color: red;
     font-weight: bold;
 }
+
+#habitListContainer {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+}
+
+#listOfAvailableHabits {
+    list-style: none;
+    padding: 0;
+}
+
+#listOfAvailableHabits li {
+    margin: 8px 0;
+}
+
+.custom-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.custom-form .habit-container {
+    margin-bottom: 15px;
+}
+
+.custom-form .habit-container label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.custom-form .habit-container input[type="time"] {
+    width: 150px;
+}
+
+.custom-form button {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.custom-form button:hover {
+    background-color: #45a049;
+}

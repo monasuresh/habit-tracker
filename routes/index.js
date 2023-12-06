@@ -7,10 +7,12 @@
 */
 //Here you will import route files and export the constructor method as shown in lecture code and worked in previous labs.
 import authRoutes from './auth_routes.js';
+import habitRoutes from './habits.js';
 import path from 'path';
 
 const constructorMethod = (app) => {
   app.use('/', authRoutes);
+  app.use('/habits', habitRoutes);
  
   app.use('*', (req, res) => {
     res.sendStatus(404);
