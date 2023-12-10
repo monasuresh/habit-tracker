@@ -9,7 +9,7 @@ router
     .route('/create-habit')
     .get(async (req, res) => {
         try {
-            return res.render('createHabit', { title: 'Create Habit' });
+            return res.render('habits', { title: 'Create Habit' });
         } catch (e) {
             return res.status(500).render('error', { message: e });
         }
@@ -30,12 +30,30 @@ router
         }
     });
 
+router.route('/track/:habitId').post(async (req, res) => {
+    let isError = false;
+    const habitDocument = req.body;
+    if (!habitDocument || Object.keys(habitDocument).length === 0) {
+        isError = true;
+        return res
+            .status(400)
+            .render('protected', { title: 'Welcome Page', message: 'There are no fields in the request body.', isError: isError });
+    }
+
+    try {
+        const trackedHabit = await trackedHabitData.addTrackedHabit(req.session.user.emailAddress, req.params.habitId, req.body.reminderTimeInput);
+        return res.json(trackedHabit);
+    } catch (e) {
+        return res.status(400).json({ error: e })
+    }
+});
+
 router
     .route('/view-all')
     .get(async (req, res) => {
         try {
             const habitList = await habitData.getAllHabits();
-            return res.render('viewAllHabits', { title: 'Registration Page', habits: habitList });
+            return res.json(habitList);
         } catch (e) {
             return res.status(500).send(e);
         }
@@ -58,13 +76,14 @@ router
     .get(async (req, res) => {
         try {
             let emailAddress = req.session.user.emailAddress;
-        let trackedHabitsList = await trackedHabitData.getAllTrackedHabitsWithNames(emailAddress);
-            return res.render('logHabits', { title: 'Log Habits', trackedHabitItems: trackedHabitsList});
+            let trackedHabitsList = await trackedHabitData.getAllTrackedHabitsWithNames(emailAddress);
+            return res.render('logHabits', { title: 'Log Habits', trackedHabitItems: trackedHabitsList });
         } catch (e) {
             return res.status(404).json({ error: e });
         }
     })
     .post(async (req, res) => {
+        let isError = false;
         const habitDocument = req.body;
         if (!habitDocument || Object.keys(habitDocument).length === 0) {
             isError = true;
@@ -81,9 +100,8 @@ router
                 .render('protected', { title: 'Welcome Page', message: 'One or more inputs are incorrect.', isError: isError });
         }
 
-        
-    });
 
+    });
 router
     .route('/modify/:habitId')
     .get(async (req, res) => {

@@ -35,7 +35,7 @@ form {
     font-weight: bold;
 }
 
-#habitListContainer {
+/*#habitListContainer {
     max-height: 300px;
     overflow-y: auto;
     border: 1px solid #ccc;
@@ -81,3 +81,45 @@ form {
 .custom-form button:hover {
     background-color: #45a049;
 }
+
+.container {
+    text-align: center;
+    margin-top: 100px;
+}
+
+.welcome-container {
+    background-color: #bd8a09;
+    color: #ffffff;
+    padding: 2rem;
+    border-radius: 15px;
+}
+
+.btn-container {
+    margin-top: 30px;
+}
+
+.btn-primary, .btn-success {
+    padding: 15px 30px;
+    font-size: 20px;
+    margin: 10px;
+    border-radius: 10px;
+}
+
+.welcome-text {
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.user-link {
+    display: inline-block;
+    margin-right: 15px;
+    text-decoration: none;
+    color: #3498db;
+}
+
+.custom-form {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+} */
