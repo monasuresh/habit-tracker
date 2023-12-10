@@ -2,16 +2,33 @@ import { ObjectId } from 'mongodb';
 import { habits } from '../config/mongoCollections.js';
 import { users } from '../config/mongoCollections.js';
 
-const addTrackedHabit = async (emailAddress, habitId, name, reminderTime) => {
+const addTrackedHabit = async (emailAddress, habitId, reminderTime) => {
     let newId = new ObjectId();
 
     const newTrackedHabit = {
         _id: newId,
         habitId: new ObjectId(habitId),
-        name: name
+        reminderTime: reminderTime
     }
 
     const userCollection = await users();
+
+    let existingTrackedHabit = await userCollection.findOne(
+        {
+            'emailAddress': emailAddress,
+            'trackedHabits.habitId': new ObjectId(habitId)
+        },
+        {
+            projection:
+            {
+                _id: 0, trackedHabits: 1
+            }
+        }
+    );
+
+    if (existingTrackedHabit) {
+        throw 'The habit has already been tracked.';
+    }
 
     const updateResult = await userCollection.updateOne({ 'emailAddress': emailAddress }, { $push: { trackedHabits: newTrackedHabit } });
 
@@ -48,6 +65,10 @@ const getTrackedHabitById = async (trackedHabitId) => {
 };
 
 const getAllTrackedHabitsWithNames = async (emailAddress) => {
+    if (!emailAddress) {
+        throw 'An email Address was not provided so the tracked habits with names could not be fetched.';
+    }
+
     const trackedHabits = await getAllTrackedHabits(emailAddress);
 
     let habitObject = {};
@@ -71,9 +92,24 @@ const getAllTrackedHabitsWithNames = async (emailAddress) => {
     return habitObject;
 };
 
+const deleteTrackedHabit = async (emailAddress, trackedHabitID) => {
+    const userCollection = await users();
+
+    const userByTrackedHabitId = await userCollection.findOne({ 'emailAddress': emailAddress, 'trackedHabits._id': new ObjectId(trackedHabitID) });
+
+    if (!userByTrackedHabitId) {
+        throw 'No tracked habit found for the provided id.';
+    }
+
+    await userCollection.updateOne({ 'emailAddress': emailAddress, 'trackedHabits._id': new ObjectId(trackedHabitID) }, { $pull: { trackedHabits: { _id: new ObjectId(trackedHabitID) } } });
+
+    return { deletedTrackedHabit: true };
+}
+
 export default {
     addTrackedHabit,
     getAllTrackedHabits,
     getAllTrackedHabitsWithNames,
-    getTrackedHabitById
+    getTrackedHabitById,
+    deleteTrackedHabit
 };
