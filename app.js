@@ -22,13 +22,13 @@ const rewriteUnsupportedBrowserMethods = (req, res, next) => {
   }
 
   // let the next middleware run:
-  console.log(" Hey I am here")
   next();
 };
+
 app.use('/public', staticDir);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-//app.use(rewriteUnsupportedBrowserMethods);
+app.use(rewriteUnsupportedBrowserMethods);
 
 app.engine('handlebars', exphbs.engine({ defaultLayout: 'main' }));
 app.set('view engine', 'handlebars');

@@ -1,0 +1,37 @@
+{{!--
+
+If the user is logged in , and 'GET /protected' endpoint is called, you will render this view based on the specs.
+
+--}}
+<!-- <header>        
+    <h1>Habit Tracker</h1>
+</header>
+<p>Welcome {{firstName}} {{lastName}}, to Habit Tracker. The time is now: {{currentTime}} and your role in the system is: <label name="role" id="role" value="{{role}}">{{role}}</label> </p>
+<div id="adminstuff" style="visibility:hidden">You are admin. Click <a href="/admin">here</a> to go to Admin page</div>
+<script type="text/javascript">
+    if (document.getElementById('role').innerHTML==="admin") {
+        document.getElementById('adminstuff').style.visibility="visible";
+    }
+</script>
+<p><a href="/logout">Logout</a></p> -->
+
+<p class="welcome-protected">Welcome {{firstName}} {{lastName}}, the time is now: {{currentTime}}. Your role in the
+    system is: {{role}}</p>
+{{#if isAdmin}}
+<a href="/admin" class="search-link">Admin</a>
+{{/if}}
+<a href="/logout" class="search-link">Logout</a>
+<form action="/protected" method="POST" class="custom-form">
+    {{#each habitItems as |habit index|}}
+    <div class="habit-container">
+        <label for="trackedHabitCheckBoxInput_{{index}}">
+            <input type="checkbox" id="trackedHabitCheckBoxInput_{{index}}" name="habits[{{index}}][trackedHabitCheckBoxInput]" value="{{_id}}">
+            {{habit.name}}
+        </label>
+
+        <label for="reminderTimeInput_{{index}}">Reminder Time:</label>
+        <input type="time" id="reminderTimeInput_{{index}}" name="habits[{{index}}][reminderTimeInput]">
+    </div>
+    {{/each}}
+    <button type="submit">Submit</button> 
+</form>

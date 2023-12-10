@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        h1 {
+            color: #007bff;
+        }
+
+        #habitLog {
+            margin-top: 20px;
+        }
+
+        .list-group-item {
+            cursor: pointer;
+        }
+
+        .list-group-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container mt-5">
+        <h1 class="mb-4">Habit Tracker</h1>
+
+        <!-- New habit entry form -->
+        <form id="habitForm">
+            <div class="form-row">
+                <div class="col-md-6 mb-3">
+                    <label for="habitInput">Habit:</label>
+                    <input type="text" class="form-control" id="habitInput" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="dateInput">Date:</label>
+                    <input type="date" class="form-control" id="dateInput" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="timeInput">Time:</label>
+                    <input type="time" class="form-control" id="timeInput" required>
+                </div>
+            </div>
+            <button class="btn btn-primary" type="submit">Add Habit Entry</button>
+        </form>
+
+        <!-- Date picker -->
+        <div class="form-group mt-4">
+            <label for="datePicker">Select Date:</label>
+            <input type="date" class="form-control" id="datePicker">
+        </div>
+
+        <!-- Habit log entries -->
+        <div id="habitLog">
+        </div>
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <script>
+        const habitLogData = [
+            { dateTime: '2023-12-01T08:00', habit: 'Exercise' },
+            { dateTime: '2023-12-01T12:30', habit: 'Read' },
+            { dateTime: '2023-12-02T09:15', habit: 'Exercise' },
+            { dateTime: '2023-12-03T18:45', habit: 'Meditate' },
+        ];
+
+        function displayHabitEntries(date) {
+            const habitLog = document.getElementById('habitLog');
+            habitLog.innerHTML = '';
+
+            const filteredEntries = habitLogData.filter(entry => entry.dateTime.startsWith(date));
+
+            if (filteredEntries.length === 0) {
+                habitLog.innerHTML = '<p>No entries for the selected date.</p>';
+            } else {
+                const ul = document.createElement('ul');
+                ul.className = 'list-group';
+
+                filteredEntries.forEach(entry => {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item';
+                    li.textContent = `${entry.dateTime.replace('T', ' ')}: ${entry.habit}`;
+                    ul.appendChild(li);
+                });
+
+                habitLog.appendChild(ul);
+            }
+        }
+
+        /*function addHabitEntry(habit, date, time) {
+            const dateTime = `${date}T${time}`;
+            habitLogData.push({ habit, dateTime });
+            displayHabitEntries(date);
+        } */
+
+        const datePicker = document.getElementById('datePicker');
+        datePicker.addEventListener('change', function () {
+            const selectedDate = this.value;
+            displayHabitEntries(selectedDate);
+        });
+
+        const habitForm = document.getElementById('habitForm');
+        habitForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const habitInput = document.getElementById('habitInput');
+            const dateInput = document.getElementById('dateInput');
+            const timeInput = document.getElementById('timeInput');
+            const habit = habitInput.value;
+            const date = dateInput.value;
+            const time = timeInput.value;
+
+            addHabitEntry();
+
+            // Clear form inputs
+            habitInput.value = '';
+            dateInput.value = '';
+            timeInput.value = '';
+        });
+
+        function addHabitEntry() {
+            const habitInput = document.getElementById('habitInput');
+            const dateInput = document.getElementById('dateInput');
+            const timeInput = document.getElementById('timeInput');
+
+            const name = habitInput.value;
+            const date = dateInput.value;
+            const time = timeInput.value;
+
+            const dateTime = `${date}T${time}`;
+            habitLogData.push({ name, dateTime });
+
+            // Make an AJAX POST request
+            $.ajax({
+                type: 'POST',
+                url: '/habits/log-habit', 
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    habitNameInput: name,
+                    dateInput: date,
+                    timeInput: time,
+                }),
+                success: function (response) {
+                    console.log('Habit entry added successfully:', response);
+                },
+                error: function (xhr, status, error) {
+                    // Handle errors during the AJAX request
+                    console.error('Error adding habit entry:', error);
+                },
+            });
+
+            displayHabitEntries(date);
+        }
+
+        const today = new Date().toISOString().split('T')[0];
+        datePicker.value = today;
+        displayHabitEntries(today);
+    </script>
+
+</body>
+
+</html>

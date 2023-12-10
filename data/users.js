@@ -44,7 +44,9 @@ const exportedMethods = {
       lastName,
       emailAddress,
       hashedPassword,
-      role
+      role,
+      trackedHabits: [],
+      habitLog: []
     };
 
     const insertInfo = await userCollection.insertOne(newUser);

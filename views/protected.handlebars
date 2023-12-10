@@ -1,6 +1,11 @@
-{{!--
+<div class="container">
+    <p class="welcome-text">
+        Welcome {{firstName}} {{lastName}}, the time is now: {{currentTime}}. Your role in the system is: {{role}}
+    </p>
 
-If the user is logged in , and 'GET /protected' endpoint is called, you will render this view based on the specs.
+    {{#if isAdmin}}
+    <a href="/admin" class="user-link">Admin</a>
+    {{/if}}
 
 --}}
 <header>
@@ -18,3 +23,26 @@ If the user is logged in , and 'GET /protected' endpoint is called, you will ren
 <p>To create individual challenge click here!</p> <a href="/individual">Add Individual Challenge</a>
 <p>To go Challanges Dashbord click here!</p><a href="/challenges">Challanges Dashbord</a>
 <p><a href="/logout">Logout</a></p>
+    <a href="/logout" class="user-link">Logout</a>
+
+    <form action="/protected" method="POST" class="custom-form">
+        <div class="subform">
+            {{#each habitItems as |habit index|}}
+            <div class="habit-container">
+                <label for="trackedHabitCheckBoxInput_{{index}}">
+                    <input type="checkbox" id="trackedHabitCheckBoxInput_{{index}}"
+                        name="habits[{{index}}][trackedHabitCheckBoxInput]" value="{{_id}}"
+                        onclick="toggleReminderInput({{index}})">
+                    {{habit.name}}
+                </label>
+                <label for="reminderTimeInput_{{index}}" class="hidden">Reminder Time:</label>
+                <input type="time" id="reminderTimeInput_{{index}}" name="habits[{{index}}][reminderTimeInput]"
+                    class="hidden">
+            </div>
+            {{/each}}
+        </div>
+
+        <button type="submit" class="submit-button">Track/Untrack</button>
+    </form>
+</div>
+<script src="/public/js/tracked_habit_scripts.js"></script>

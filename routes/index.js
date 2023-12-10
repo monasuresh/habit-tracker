@@ -11,6 +11,8 @@ import groupRoutes from './groups.js';
 import userRoutes from './users.js';
 import challangeRoutes from './challenges.js';
 import individualRoutes from './individual.js';
+import habitRoutes from './habits.js';
+import trackedHabitRoutes from './trackedHabits.js';
 import path from 'path';
 
 const constructorMethod = (app) => {
@@ -22,6 +24,9 @@ const constructorMethod = (app) => {
   app.use('/challenges', challangeRoutes);
   app.use('/individual', individualRoutes);
 
+  app.use('/habits', habitRoutes);
+  app.use('/tracked-habits', trackedHabitRoutes);
+ 
   app.use('*', (req, res) => {
     console.log("404 calling")
     console.log(`[${new Date().toUTCString()}]: ${req.method} ${req.originalUrl} - Not Found`);

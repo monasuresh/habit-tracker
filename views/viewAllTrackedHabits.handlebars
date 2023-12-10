@@ -1,0 +1,11 @@
+<h1>Habits</h1>
+<div id="habitListContainer">
+    <ul id="listOfAvailablTrackedHabits">
+        {{#each trackedHabitItems}}
+            <li>
+                <span>{{name}}</span>
+                <button id="deleteTrackedHabit" data-tracked-habit-id="{{_id}}">Delete</button>
+            </li>
+        {{/each}}
+    </ul>
+</div>

@@ -3,6 +3,8 @@ import { Router } from 'express';
 const router = Router();
 import userData from '../data/users.js';
 import validation from '../validation.js';
+import { habitData } from '../data/index.js';
+import { trackedHabitData } from '../data/index.js';
 
 router.route('/').get(async (req, res) => {
   //code here for GET THIS ROUTE SHOULD NEVER FIRE BECAUSE OF MIDDLEWARE #1 IN SPECS.
@@ -108,10 +110,45 @@ router
     }
   });
 
-router.route('/protected').get(async (req, res) => {
+/*router.route('/protected').get(async (req, res) => {
   var currentdate = new Date();
   var currentTime = currentdate.getHours() + ":" + currentdate.getMinutes() + ":" + currentdate.getSeconds();
-  res.render('protected', { firstName: req.session.user.firstName, lastName: req.session.user.lastName, currentTime: currentTime, role: req.session.user.role });
+  res.render('protected',{firstName: req.session.user.firstName, lastName: req.session.user.lastName, currentTime: currentTime, role: req.session.user.role});
+}); */
+
+router.route('/protected').get(async (req, res) => {
+  try {
+    const currentTime = new Date();
+    let isAdmin = req.session.user.role === 'admin';
+    const habitItems = await habitData.getAllHabits();
+    return res.render('protected', { title: 'User Page', firstName: req.session.user.firstName, lastName: req.session.user.lastName, currentTime: currentTime, role: req.session.user.role, isAdmin: isAdmin, habitItems: habitItems });
+  } catch (e) {
+    return res.status(500).render('error', { message: 'Internal Server Error' });
+  }
+});
+
+router.route('/protected').post(async (req, res) => {
+  let isError = false;
+  const habitDocument = req.body;
+  if (!habitDocument || Object.keys(habitDocument).length === 0) {
+    isError = true;
+    return res
+      .status(400)
+      .render('protected', { title: 'Welcome Page', message: 'There are no fields in the request body.', isError: isError });
+  }
+
+  try {
+    let habit = habitDocument['habits'];
+    for (let trackedHabitKey in habit) {
+      let specificHabit = habit[trackedHabitKey];
+      console.log(specificHabit.trackedHabitCheckBoxInput);
+      await trackedHabitData.addTrackedHabit(req.session.user.emailAddress, specificHabit.trackedHabitCheckBoxInput, specificHabit.reminderTimeInput);
+    }
+  } catch (e) {
+    return res
+      .status(400)
+      .render('protected', { title: 'Welcome Page', message: 'One or more inputs are incorrect.', isError: isError });
+  }
 });
 
 router.route('/admin').get(async (req, res) => {
