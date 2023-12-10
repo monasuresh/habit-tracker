@@ -1,0 +1,54 @@
+{{!--
+
+Challenges handelbars
+
+--}}
+<header>
+    <h1>Habit Tracker - Challenges</h1>
+</header>
+
+<main>
+    <form action="/challenges" id="challenges-form" method="GET">
+        <p>Hello This is challenges Page!</p>
+        <p>You are part of below challanges</p>
+
+        <h2>Your Groups:</h2>
+        {{#if groupDataRet}}
+            {{#each groupDataRet}}
+                <p>
+                    Group Name: {{groupname}}
+                    <br>
+                    Habit: {{habit}}
+                    <br>
+                    StartDate: {{startdate}}
+                    <br>
+                    EndDate: {{enddate}}
+                    <br>
+                    Score: {{score}}
+                </p>
+            {{/each}}
+        {{else}}
+            <p>No group data available.</p>
+        {{/if}}
+
+        <h2>Your Individual Challenges:</h2>
+        {{#if individualDataRet}}
+            {{#each individualDataRet}}
+                <p>
+                    Challenge Name: {{challengename}}
+                    <br>
+                    Habit: {{habit}}
+                    <br>
+                    StartDate: {{startdate}}
+                    <br>
+                    EndDate: {{enddate}}
+                    <br>
+                    Score: {{score}}
+                </p>
+            {{/each}}
+        {{else}}
+            <p>No individual challenges data available.</p>
+        {{/if}}
+        <div id="error"></div>
+    </form>
+</main>

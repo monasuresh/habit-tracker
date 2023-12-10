@@ -9,6 +9,10 @@
 import authRoutes from './auth_routes.js';
 import habitRoutes from './habits.js';
 import trackedHabitRoutes from './trackedHabits.js';
+import groupRoutes from './groups.js';
+import userRoutes from './users.js';
+import challangeRoutes from './challenges.js';
+import individualRoutes from './individual.js';
 import path from 'path';
 
 const constructorMethod = (app) => {
@@ -16,7 +20,16 @@ const constructorMethod = (app) => {
   app.use('/habits', habitRoutes);
   app.use('/tracked-habits', trackedHabitRoutes);
  
+  console.log("I am in index route")
+  app.use('/groups', groupRoutes);
+  console.log("I am going in groups")
+  app.use('/users', userRoutes);
+  app.use('/challenges', challangeRoutes);
+  app.use('/individual', individualRoutes);
+
   app.use('*', (req, res) => {
+    console.log("404 calling")
+    console.log(`[${new Date().toUTCString()}]: ${req.method} ${req.originalUrl} - Not Found`);
     res.sendStatus(404);
   });
 };

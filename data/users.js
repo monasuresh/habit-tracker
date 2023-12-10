@@ -80,8 +80,8 @@ const exportedMethods = {
     }
 
     // Return user information excluding the password
-    const { firstName, lastName, emailAddress, role } = user;
-    return { firstName, lastName, emailAddress, role };
+    const { _id, firstName, lastName, emailAddress, role } = user;
+    return { _id, firstName, lastName, emailAddress, role };
   }
 };
 

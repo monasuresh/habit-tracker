@@ -1,4 +1,4 @@
-import {dbConnection} from './mongoConnection.js';
+import { dbConnection } from './mongoConnection.js';
 
 /* This will allow you to have one reference to each collection per app */
 /* Feel free to copy and paste this this */
@@ -20,3 +20,5 @@ NOTE: YOU WILL NEED TO CHANGE THE CODE BELOW AND UNCOMMENT IT TO HAVE THE COLLEC
 
 export const users = getCollectionFn('users');
 export const habits = getCollectionFn('habits');
+export const groups = getCollectionFn('groups');
+export const individual = getCollectionFn('individual');

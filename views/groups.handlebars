@@ -1,0 +1,40 @@
+{{!--
+
+groups handelbars
+
+--}}
+<header>
+    <h1>Habit Tracker - Add Groups</h1>
+</header>
+
+<main>
+    <form action="/groups" id="groups-form" method="POST">
+        <div>
+            <label for="groupNameInput">Group Name:</label>
+            <input type="text" id="groupNameInput" name="groupNameInput" placeholder="Enter Your Group Name">
+        </div>
+        <div>
+            <label for="habitInput">Select Habit:</label>
+            <select id="habitInput" name="habitInput">
+                <option value="admin">Admin</option>
+            </select>
+        </div>
+        <div>
+            <label for="startdateInput">Start Date:</label>
+            <input type="date" id="startdateInput" name="startdateInput" placeholder="Enter Start date">
+        </div>
+        <div>
+            <label for="enddateInput">End Date:</label>
+            <input type="date" id="enddateInput" name="enddateInput" placeholder="Enter End date">
+        </div>
+        <div>
+            <label for="userInput">Select Participate:</label>
+            <select id="userInput" name="userInput">
+            </select>
+        </div>
+        <div>
+            <button type="submit" class="submitBtn" name="submitBtn">Add Group</button>
+        </div>
+        <div id="error"></div>
+    </form>
+</main>
