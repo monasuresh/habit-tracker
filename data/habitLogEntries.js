@@ -4,7 +4,7 @@ import { habits } from '../config/mongoCollections.js';
 import validation from '../validation.js';
 
 const logHabit = async (emailAddress, trackedHabitName, date, time) => {
-    if (!emailAddress || !trackedHabitID || !date || !time) {
+    if (!emailAddress || !trackedHabitName || !date || !time) {
         throw 'All fields must be supplied';
     }
 
@@ -36,22 +36,27 @@ const logHabit = async (emailAddress, trackedHabitName, date, time) => {
     // Get the habit ID
 
     const habitCollection = await habits();
+    const userCollection = await users();
 
     let habit = await habitCollection.findOne({'name': trackedHabitName});
+    let trackedHabit = await userCollection.findOne(
+        { 'emailAddress': emailAddress, 'trackedHabits.habitId': habit._id },
+        { projection: { _id: 0, 'trackedHabits.$': 1 } }
+      );
 
-    
+    if (!trackedHabit || trackedHabit.trackedHabits.length === 0) {
+        throw 'The provided habit has not yet been tracked.';
+    }
 
     let newId = new ObjectId();
 
     const newLogEntry = {
         _id: newId,
         trackedHabitName: trackedHabitName,
-        trackedHabitID: new ObjectId(trackedHabitID),
+        trackedHabitID: new ObjectId(trackedHabit.trackedHabits[0]._id),
         date: date,
         time: time
     }
-
-    const userCollection = await users();
 
     const updateResult = await userCollection.updateOne({ 'emailAddress': emailAddress }, { $push: { habitLog: newLogEntry } });
 
@@ -59,17 +64,23 @@ const logHabit = async (emailAddress, trackedHabitName, date, time) => {
         throw 'Could not update user tracked habit successfully';
     }
 
-    return { updatedTrackedHabits: true };
+    let habitLogEntry = await getHabitLogEntryById(emailAddress, newId);
+
+    return habitLogEntry;
 }
 
-const getHabitLogEntryById = async (habitLogEntryId) => {
+const getHabitLogEntryById = async (emailAddress, habitLogEntryId) => {
+    if (!emailAddress) {
+        throw 'The user is not logged in.';
+    }
+
     const userCollection = await users();
     const habitLogEntry = await userCollection.findOne(
-        { 'habitLog._id': new ObjectId(habitLogEntryId) },
+        { 'emailAddress': emailAddress, 'habitLog._id': habitLogEntryId },
         { projection: { _id: 0, 'habitLog.$': 1 } }
     );
 
-    if (!habitLogEntry) {
+    if (!habitLogEntry || habitLogEntry.habitLog.length === 0) {
         throw 'Could not find habit log entry for the provided id.';
     }
 

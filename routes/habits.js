@@ -76,8 +76,8 @@ router
     .get(async (req, res) => {
         try {
             let emailAddress = req.session.user.emailAddress;
-            let trackedHabitsList = await trackedHabitData.getAllTrackedHabitsWithNames(emailAddress);
-            return res.render('logHabits', { title: 'Log Habits', trackedHabitItems: trackedHabitsList });
+            let habitLogEntry = await habitLogData.getAllHabitLogEntries(emailAddress);
+            return res.json(habitLogEntry);
         } catch (e) {
             return res.status(404).json({ error: e });
         }
@@ -93,7 +93,8 @@ router
         }
 
         try {
-            await habitLogData.logHabit(req.session.user.emailAddress, habitDocument.habitNameInput, habitDocument.dateInput, habitDocument.timeInput);
+            let habitEntry = await habitLogData.logHabit(req.session.user.emailAddress, habitDocument.habitNameInput, habitDocument.dateInput, habitDocument.timeInput);
+            return res.json(habitEntry);
         } catch (e) {
             return res
                 .status(400)
