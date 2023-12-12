@@ -126,25 +126,59 @@ function showPass(fieldName) {
   }
 }
 
+async function deleteGroup(groupId) {
+  try {
+    const response = await fetch(`/groups/delete-group/${groupId}`, {
+      method: 'DELETE',
+    });
+
+    if (response.ok) {
+      console.log('Group deleted successfully');
+      location.reload(); // Refresh the page
+    } else {
+      console.error('Error deleting group:', response.statusText);
+    }
+  } catch (error) {
+    console.error('Fetch error:', error);
+  }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   try {
     // Fetch user data from your MongoDB collection or server
-    console.log("I am fetching users data");
-    const response = await fetch('/users'); // Replace with your actual endpoint
-    const userData = await response.json();
-    console.log("I am client side ----------------");
-    console.log(userData);
+    if (window.location.pathname === '/groups') {
+      console.log("I am fetching users data");
+      const response = await fetch('/users');
+      const userData = await response.json();
+      console.log("I am client side ----------------");
+      console.log(userData);
 
-    // Get the select element
-    const selectElement = document.getElementById('userInput');
+      // Get the select element
+      const selectElement = document.getElementById('userInput');
 
-    // Create an option for each user and append it to the select element
-    userData.forEach(user => {
-      const option = document.createElement('option');
-      option.value = user._id; // Set the value to the user's unique identifier
-      option.text = `${user.firstName} ${user.lastName}`;
-      selectElement.add(option);
-    });
+      // Create an option for each user and append it to the select element
+      userData.forEach(user => {
+        const option = document.createElement('option');
+        option.value = user._id; // Set the value to the user's unique identifier
+        option.text = `${user.firstName} ${user.lastName}`;
+        selectElement.add(option);
+      });
+    }
+    if (window.location.pathname === '/groups' || window.location.pathname === '/individual') {
+      const response_habit = await fetch('/habits/view-all');
+      console.log("checking for habits:", response_habit);
+      const habitsData = await response_habit.json();
+      console.log(habitsData);
+
+      const selectElementHabit = document.getElementById('habitInput');
+
+      habitsData.forEach(habit => {
+        const option = document.createElement('option');
+        option.value = habit._id;
+        option.text = `${habit.name}`;
+        selectElementHabit.add(option);
+      });
+    }
   } catch (error) {
     console.error('Error fetching user data:', error);
   }

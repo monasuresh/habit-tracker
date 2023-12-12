@@ -7,19 +7,45 @@
     <a href="/admin" class="user-link">Admin</a>
     {{/if}}
 
---}}
-<header>
-    <h1>Habit Tracker</h1>
-</header>
-<p>Welcome {{firstName}} {{lastName}}, to Habit Tracker. The time is now: {{currentTime}} and your role in the system
-    is: <label name="role" id="role" value="{{role}}">{{role}}</label> </p>
-<div id="adminstuff" style="visibility:hidden">You are admin. Click <a href="/admin">here</a> to go to Admin page</div>
-<script type="text/javascript">
-    if (document.getElementById('role').innerHTML === "admin") {
-        document.getElementById('adminstuff').style.visibility = "visible";
-    }
-</script>
-<p>To create group click here!</p> <a href="/groups">Add Group</a>
-<p>To create individual challenge click here!</p> <a href="/individual">Add Individual Challenge</a>
-<p>To go Challanges Dashbord click here!</p><a href="/challenges">Challanges Dashbord</a>
-<p><a href="/logout">Logout</a></p>
+    --}}
+    <header>
+        <h1>Habit Tracker</h1>
+    </header>
+    <p>Welcome {{firstName}} {{lastName}}, to Habit Tracker. The time is now: {{currentTime}} and your role in the
+        system
+        is: <label name="role" id="role" value="{{role}}">{{role}}</label> </p>
+    <div id="adminstuff" style="visibility:hidden">You are admin. Click <a href="/admin">here</a> to go to Admin page
+    </div>
+    <script type="text/javascript">
+        if (document.getElementById('role').innerHTML === "admin") {
+            document.getElementById('adminstuff').style.visibility = "visible";
+        }
+    </script>
+    <p>To add new habits</p><a href="/habits/create-habit">Add Habits</a>
+    <p>To create group click here!</p> <a href="/groups">Add Group</a>
+    <p>To create individual challenge click here!</p> <a href="/individual">Add Individual Challenge</a>
+    <p>To go Challanges Dashbord click here!</p><a href="/challenges">Challanges Dashbord</a>
+    <p><a href="/logout">Logout</a></p>
+    <a href="/logout" class="user-link">Logout</a>
+
+    <form action="/protected" method="POST" class="custom-form">
+        <div class="subform">
+            {{#each habitItems as |habit index|}}
+            <div class="habit-container">
+                <label for="trackedHabitCheckBoxInput_{{index}}">
+                    <input type="checkbox" id="trackedHabitCheckBoxInput_{{index}}"
+                        name="habits[{{index}}][trackedHabitCheckBoxInput]" value="{{_id}}"
+                        onclick="toggleReminderInput({{index}})">
+                    {{habit.name}}
+                </label>
+                <label for="reminderTimeInput_{{index}}" class="hidden">Reminder Time:</label>
+                <input type="time" id="reminderTimeInput_{{index}}" name="habits[{{index}}][reminderTimeInput]"
+                    class="hidden">
+            </div>
+            {{/each}}
+        </div>
+
+        <button type="submit" class="submit-button">Track/Untrack</button>
+    </form>
+</div>
+<script src="/public/js/tracked_habit_scripts.js"></script>

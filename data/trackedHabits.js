@@ -115,8 +115,6 @@ const getAllTrackedHabitsWithNames = async (emailAddress) => {
             habitObject[globalHabitName.name] = trackedHabit;
         }
     }
-
-
     return habitObject;
 };
 
@@ -160,6 +158,9 @@ const deleteTrackedHabit = async (emailAddress, trackedHabitID) => {
 
     return { deletedTrackedHabit: true };
 }
+
+
+
 
 export default {
     addTrackedHabit,

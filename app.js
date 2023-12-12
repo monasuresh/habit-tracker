@@ -26,12 +26,31 @@ const rewriteUnsupportedBrowserMethods = (req, res, next) => {
   next();
 };
 
+const ifEqualHelper = (a, b, options) => (a === b ? options.fn(this) : options.inverse(this));
+
+const toHexStringHelper = function (objectId, options) {
+  if (objectId && objectId.toHexString) {
+      return objectId.toHexString();
+  }
+  if (options && options.inverse) {
+      return options.inverse(this);
+  }
+  return '';
+};
+
+const hbs = exphbs.create({
+    helpers: {
+        ifEqual: ifEqualHelper,
+        toHexString: toHexStringHelper,
+    },
+});
+
 app.use('/public', staticDir);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(rewriteUnsupportedBrowserMethods);
 
-app.engine('handlebars', exphbs.engine({ defaultLayout: 'main' }));
+app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 
 app.use(
@@ -204,6 +223,8 @@ app.use('/individual', (req, res, next) => {
   //console.log("I am out")
   //next();
 });
+
+
 
 
 
