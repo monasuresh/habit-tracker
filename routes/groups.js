@@ -55,5 +55,16 @@ router.post('/', async (req, res) => {
   }
 });
 
+router
+    .route('/delete-group/:groupId')
+    .delete(async (req, res) => {
+        try {
+            const deletedGroup = await groupData.deleteGroup(req.params.groupId);
+            return res.json(deletedGroup);
+        } catch (e) {
+            return res.status(404).json({ error: e });
+        }
+});
+
 
 export default router;

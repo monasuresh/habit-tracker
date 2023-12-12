@@ -21,6 +21,7 @@ If the user is logged in , and 'GET /protected' endpoint is called, you will ren
 <a href="/admin" class="search-link">Admin</a>
 {{/if}}
 <a href="/logout" class="search-link">Logout</a>
+<a href="/habits/create-habit"></a>
 <form action="/protected" method="POST" class="custom-form">
     {{#each habitItems as |habit index|}}
     <div class="habit-container">

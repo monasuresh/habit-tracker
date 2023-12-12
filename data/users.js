@@ -46,7 +46,9 @@ const exportedMethods = {
       hashedPassword,
       role,
       trackedHabits: [],
-      habitLog: []
+      habitLog: [],
+      grouphabitlog: [],
+      individualhabitlog: []
     };
 
     const insertInfo = await userCollection.insertOne(newUser);
@@ -82,7 +84,22 @@ const exportedMethods = {
     // Return user information excluding the password
     const { _id, firstName, lastName, emailAddress, role } = user;
     return { _id, firstName, lastName, emailAddress, role };
+  },
+
+  async getUserById(userId) {
+    if (!userId) throw 'You must provide an id to search for';
+
+    if (!ObjectId.isValid(userId)) {
+      throw 'The user id is not a valid ObjectId.';
+    }
+    console.log("I am in get by user id:", userId);
+    const userCollection = await users();
+    const users = await userCollection.findOne({ _id: new ObjectId(userId) });
+    console.log(users);
+    if (!users) throw 'No Users with that id';
+    return users;
   }
+
 };
 
 export default exportedMethods;
