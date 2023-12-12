@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Habit Tracker</title>
+    <title>Habit Log</title>
     <!-- Bootstrap CSS -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -44,7 +44,7 @@
 <body>
 
     <div class="container mt-5">
-        <h1 class="mb-4">Habit Tracker</h1>
+        <h1 class="mb-4">Habit Log</h1>
 
         <!-- New habit entry form -->
         <form id="habitForm">
@@ -62,12 +62,12 @@
                     <input type="time" class="form-control" id="timeInput" required>
                 </div>
             </div>
-            <button class="btn btn-primary" type="submit">Add Habit Entry</button>
+            <button class="btn btn-primary" type="submit">Log Habit</button>
         </form>
 
         <!-- Date picker -->
         <div class="form-group mt-4">
-            <label for="datePicker">Select Date:</label>
+            <label for="datePicker">View by Date:</label>
             <input type="date" class="form-control" id="datePicker">
         </div>
 
@@ -104,7 +104,14 @@
                 filteredEntries.forEach(entry => {
                     const li = document.createElement('li');
                     li.className = 'list-group-item';
-                    li.textContent = `${entry.dateTime.replace('T', ' ')}: ${entry.habit}`;
+
+                    // Display habit name, date, and time in the desired format
+                    const dateTime = new Date(entry.dateTime);
+                    const formattedDate = dateTime.toLocaleDateString();
+                    const formattedTime = dateTime.toLocaleTimeString();
+
+                    li.innerHTML = `Name: ${entry.name}<br>Date: ${formattedDate}<br>Time: ${formattedTime}`;
+
                     ul.appendChild(li);
                 });
 
@@ -157,7 +164,7 @@
             // Make an AJAX POST request
             $.ajax({
                 type: 'POST',
-                url: '/habits/log-habit', 
+                url: '/habits/log-habit',
                 contentType: 'application/json',
                 data: JSON.stringify({
                     habitNameInput: name,
@@ -166,19 +173,48 @@
                 }),
                 success: function (response) {
                     console.log('Habit entry added successfully:', response);
+
+                    datePicker.value = date;
+
+                    const changeEvent = new Event('change');
+                    datePicker.dispatchEvent(changeEvent);
                 },
                 error: function (xhr, status, error) {
-                    // Handle errors during the AJAX request
                     console.error('Error adding habit entry:', error);
                 },
             });
-
-            displayHabitEntries(date);
         }
 
-        const today = new Date().toISOString().split('T')[0];
-        datePicker.value = today;
-        displayHabitEntries(today);
+        function populateHabitLogData() {
+            // Make an AJAX GET request to retrieve habit log entries
+            $.ajax({
+                type: 'GET',
+                url: '/habits/log-habit',
+                success: function (response) {
+                    habitLogData.length = 0; // Clear existing data
+
+                    for (let item of response) {
+                        const dateTime = `${item.date}T${item.time}`;
+                        const name = item.trackedHabitName;
+                        habitLogData.push({ name, dateTime });
+                    }
+
+                    const today = new Date().toISOString().split('T')[0];
+                    displayHabitEntries(today);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error retrieving habit log entries:', error);
+                },
+            });
+        }
+
+        $(document).ready(function () {
+            populateHabitLogData();
+        });
+
+        //const today = new Date().toISOString().split('T')[0];
+        //datePicker.value = today;
+        //displayHabitEntries(today);
     </script>
 
 </body>
