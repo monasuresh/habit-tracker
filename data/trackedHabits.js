@@ -36,7 +36,9 @@ const addTrackedHabit = async (emailAddress, habitId, reminderTime) => {
         throw 'Could not update user tracked habit successfully';
     }
 
-    return { updatedTrackedHabits: true };
+    let updatedTrackedHabit = await getTrackedHabitById(newId.toString());
+
+    return updatedTrackedHabit;
 };
 
 const getAllTrackedHabits = async (emailAddress) => {
@@ -101,7 +103,11 @@ const deleteTrackedHabit = async (emailAddress, trackedHabitID) => {
         throw 'No tracked habit found for the provided id.';
     }
 
-    await userCollection.updateOne({ 'emailAddress': emailAddress, 'trackedHabits._id': new ObjectId(trackedHabitID) }, { $pull: { trackedHabits: { _id: new ObjectId(trackedHabitID) } } });
+    let deletedTrackedHabit = await userCollection.updateOne({ 'emailAddress': emailAddress, 'trackedHabits._id': new ObjectId(trackedHabitID) }, { $pull: { trackedHabits: { _id: new ObjectId(trackedHabitID) } } });
+
+    if (!deletedTrackedHabit) {
+        throw 'Could not delete the tracked habit.';
+    }
 
     return { deletedTrackedHabit: true };
 }

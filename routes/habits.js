@@ -2,6 +2,7 @@ import { habitData } from '../data/index.js';
 import express from 'express';
 import { trackedHabitData } from '../data/index.js';
 import { habitLogData } from '../data/index.js';
+import validation from '../validation.js';
 
 const router = express.Router();
 
@@ -83,25 +84,67 @@ router
         }
     })
     .post(async (req, res) => {
-        let isError = false;
         const habitDocument = req.body;
         if (!habitDocument || Object.keys(habitDocument).length === 0) {
-            isError = true;
-            return res
-                .status(400)
-                .render('protected', { title: 'Welcome Page', message: 'There are no fields in the request body.', isError: isError });
+            return res.status(400).json({ error: 'At least one parameter must be provided.' });
+        }
+
+        let emailAddress;
+        if (!req.session.user) {
+            return res.status(401).json({error: 'The current user is unauthorized.'});
+        } else {
+            emailAddress = req.session.user.emailAddress;
+        }
+
+        let trackedHabitName = habitDocument.habitNameInput;
+        let date = habitDocument.dateInput;
+        let time = habitDocument.timeInput;
+
+        if (!emailAddress) {
+            return res.status(401).json({ error: 'The user has not been authenticated.' });
+        }
+
+        if (!emailAddress || !trackedHabitName || !date || !time) {
+            return res.status(400).json({ error: 'One or more fields were not supplied.' });
         }
 
         try {
-            let habitEntry = await habitLogData.logHabit(req.session.user.emailAddress, habitDocument.habitNameInput, habitDocument.dateInput, habitDocument.timeInput);
-            return res.json(habitEntry);
+            emailAddress = validation.validateEmailAddress(emailAddress);
         } catch (e) {
-            return res
-                .status(400)
-                .render('protected', { title: 'Welcome Page', message: 'One or more inputs are incorrect.', isError: isError });
+            return res.status(400).json({ error: e });
         }
 
+        try {
+            date = validation.isValidHyphenSeparatedDate(date);
+        } catch (e) {
+            return res.status(400).json({ error: e });
+        }
 
+        try {
+            time = validation.isValidTime24HourFormat(time);
+        } catch (e) {
+            return res.status(400).json({ error: e });
+        }
+
+        let dateTimeInput = new Date(date + 'T' + time);
+        let currentDateTime = new Date();
+
+        if (dateTimeInput > currentDateTime) {
+            return res.status(400).json({ error: 'The date/time logged must be not after the current date/time.' });
+        }
+
+        try {
+            await validation.checkIfEmailAddressExistsInDb(emailAddress);
+        } catch (e) {
+            return res.status(404).json({ error: e });
+        }
+
+        try {
+            let habitEntry = await habitLogData.logHabit(emailAddress, trackedHabitName, date, time);
+            return res.json(habitEntry);
+        } catch (e) {
+            return res.status(404).json({ error: e });
+        }
     });
 router
     .route('/modify/:habitId')
