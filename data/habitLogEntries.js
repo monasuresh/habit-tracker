@@ -8,13 +8,7 @@ const logHabit = async (emailAddress, trackedHabitName, date, time) => {
         throw 'All fields must be supplied';
     }
 
-    if (typeof emailAddress !== 'string' || !validation.isEmailValid(emailAddress)) {
-        throw 'The email address is invalid.';
-    }
-
-    emailAddress = emailAddress.trim();
-
-    // Check to see if the email address exists in the database. If not, throw an error.
+    emailAddress = validation.validateEmailAddress(emailAddress);
 
     date = validation.isValidHyphenSeparatedDate(date);
 
@@ -27,18 +21,19 @@ const logHabit = async (emailAddress, trackedHabitName, date, time) => {
         throw 'The date/time logged must be not after the current date/time.';
     }
 
-    //Checking to see if the current date/time combo is greater than the current time. If it is, it's invalid.
+    // Check to see if there is a user with the specified email address. If not, throw an error.
 
-    /*if (!ObjectId.isValid(trackedHabitID)) {
-        throw 'The provided tracked habit id is not a valid object Id.';
-    } */
-
-    // Get the habit ID
+    await validation.checkIfEmailAddressExistsInDb(emailAddress);
 
     const habitCollection = await habits();
     const userCollection = await users();
 
     let habit = await habitCollection.findOne({'name': trackedHabitName});
+
+    if (!habit) {
+        throw 'No habit exists for the provided tracked habit name.';
+    }
+
     let trackedHabit = await userCollection.findOne(
         { 'emailAddress': emailAddress, 'trackedHabits.habitId': habit._id },
         { projection: { _id: 0, 'trackedHabits.$': 1 } }
@@ -70,8 +65,16 @@ const logHabit = async (emailAddress, trackedHabitName, date, time) => {
 }
 
 const getHabitLogEntryById = async (emailAddress, habitLogEntryId) => {
-    if (!emailAddress) {
-        throw 'The user is not logged in.';
+    emailAddress = validation.validateEmailAddress(emailAddress);
+
+    await validation.checkIfEmailAddressExistsInDb(emailAddress);
+
+    if (!habitLogEntryId) {
+        throw 'You must provide an id to search for.';
+    }
+
+    if (!ObjectId.isValid(habitLogEntryId)) {
+        throw 'Invalid id.';
     }
 
     const userCollection = await users();
@@ -88,9 +91,14 @@ const getHabitLogEntryById = async (emailAddress, habitLogEntryId) => {
 };
 
 const getAllHabitLogEntries = async (emailAddress) => {
-    //Check to see if the email address is a valid string
+    emailAddress = validation.validateEmailAddress(emailAddress);
+
+    await validation.checkIfEmailAddressExistsInDb(emailAddress);
+
     const userCollection = await users();
+
     const habitLogEntriesList = await userCollection.findOne({ 'emailAddress': emailAddress }, { projection: { _id: 0, habitLog: 1 } });
+
     if (!habitLogEntriesList) {
         throw 'Could not find habit log entries';
     }

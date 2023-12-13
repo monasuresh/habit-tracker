@@ -1,5 +1,6 @@
 import moment from 'moment';
 import { ObjectId } from 'mongodb';
+import { users } from './config/mongoCollections.js';
 
 const exportedMethods = {
   checkId(id, varName) {
@@ -211,9 +212,9 @@ const exportedMethods = {
         throw 'The email address must not be empty or a string with just spaces.';
     }
 
-    const emailRegex = /^[a-zA-Z0-9]+([._-][a-zA-Z0-9]+)*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*\.[a-zA-Z]{2,}$/;
+    //const emailRegex = /^[a-zA-Z0-9]+([._-][a-zA-Z0-9]+)*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*\.[a-zA-Z]{2,}$/;
 
-    if (!emailRegex.test(emailAddress)) {
+    if (!this.isEmailValid(emailAddress)) {
         throw 'Invalid email address.';
     }
 
@@ -234,6 +235,16 @@ const exportedMethods = {
     }
 
     return id;
+  },
+
+  async checkIfEmailAddressExistsInDb(emailAddress) {
+    let userCollection = await users();
+    
+    let foundUser = await userCollection.findOne({'emailAddress': emailAddress});
+
+    if (!foundUser) {
+      throw 'No user with the provided email address could be found.';
+    }
   }
 }
 export default exportedMethods;

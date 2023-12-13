@@ -45,6 +45,7 @@
 
     <div class="container mt-5">
         <h1 class="mb-4">Habit Log</h1>
+        <div id="errorContainer" class="alert alert-danger" style="display: none;"></div>
 
         <!-- New habit entry form -->
         <form id="habitForm">
@@ -149,6 +150,17 @@
             timeInput.value = '';
         });
 
+        function displayHabitLogError(message) {
+            const errorContainer = document.getElementById('errorContainer');
+            errorContainer.textContent = message;
+            errorContainer.style.display = 'block';
+
+            // Optionally, hide the error after a few seconds
+            setTimeout(() => {
+                errorContainer.style.display = 'none';
+            }, 5000); // Adjust the timeout as needed
+        }
+
         function addHabitEntry() {
             const habitInput = document.getElementById('habitInput');
             const dateInput = document.getElementById('dateInput');
@@ -179,8 +191,10 @@
                     const changeEvent = new Event('change');
                     datePicker.dispatchEvent(changeEvent);
                 },
-                error: function (xhr, status, error) {
-                    console.error('Error adding habit entry:', error);
+                error: function (jqXHR, textStatus, errorThrown) {
+                    // Handle error response
+                    let errorMessage = jqXHR.responseJSON.error;
+                    displayHabitLogError(errorMessage);
                 },
             });
         }

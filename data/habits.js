@@ -11,6 +11,16 @@ const createHabit = async (
 ) => {
     let validHabitParams = validation.validateHabitParams(name, effect, category, weight, false);
 
+    const habitCollection = await habits();
+
+    validHabitParams.name = validHabitParams.name.toUpperCase();
+
+    let duplicateHabit = await habitCollection.findOne({'name': validHabitParams.name});
+
+    if (duplicateHabit) {
+        throw `A habit with the name ${name} already exists`;
+    }
+
     // Create a new habit object
     const newHabit = {
         name: validHabitParams.name,
@@ -18,8 +28,6 @@ const createHabit = async (
         category: validHabitParams.category,
         weight: validHabitParams.weight
     };
-
-    const habitCollection = await habits();
 
     const insertInfo = await habitCollection.insertOne(newHabit);
 
@@ -110,8 +118,8 @@ const deleteHabit = async (habitId) => {
 };
 
 const modifyHabit = async (habitId, habitInfo) => {
-    let validHabitParams = validation.validateHabitParams(habitInfo.nameInput, habitInfo.effectInput, habitInfo.categoryInput, habitInfo.weightInput, true);
     if (!habitId) throw 'You must provide an id to search for';
+    let validHabitParams = validation.validateHabitParams(habitInfo.nameInput, habitInfo.effectInput, habitInfo.categoryInput, habitInfo.weightInput, true);
 
     let updatedHabit = {}
 

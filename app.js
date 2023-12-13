@@ -6,6 +6,7 @@ import configRoutes from './routes/index.js';
 import exphbs from 'express-handlebars';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import validate from './validation.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
