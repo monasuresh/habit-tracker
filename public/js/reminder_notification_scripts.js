@@ -1,36 +1,111 @@
+let isFetchingData = false;
 let trackedHabitsList;
+let habitsList;
+let habitLogsList;
+let notificationMessage = '';
 
-async function fetchReminderTimes() {
-    try {
-        reminderTime = data.reminderTime;
-    } catch (error) {
-        console.error('Error fetching reminder time:', error);
+function fetchReminderTimes() {
+    if (isFetchingData) {
+        return;
+    }
+
+    isFetchingData = true;
+
+    notificationMessage = ''; // Reset the notification message at the beginning
+
+    const trackedHabitsPromise = $.ajax({
+        type: 'GET',
+        url: '/tracked-habits/get-all',
+    });
+
+    const habitsPromise = $.ajax({
+        type: 'GET',
+        url: '/habits/view-all',
+    });
+
+    const habitLogsPromise = $.ajax({
+        type: 'GET',
+        url: '/habits/log-habit',
+    });
+
+    // Wait for promises to resolve
+    Promise.all([trackedHabitsPromise, habitsPromise, habitLogsPromise])
+        .then(([trackedResponse, habitsResponse, habitLogsResponse]) => {
+            trackedHabitsList = trackedResponse;
+            habitsList = habitsResponse;
+            habitLogsList = habitLogsResponse;
+
+            // Call the function that depends on the data
+            processReminderTimes();
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+        })
+        .finally(() => {
+            isFetchingData = false;
+        });
+}
+
+function processReminderTimes() {
+    for (let trackedHabit of trackedHabitsList) {
+        let trackedHabitName;
+        for (let habit of habitsList) {
+            if (trackedHabit.habitId === habit._id) {
+                trackedHabitName = habit.name;
+            }
+        }
+
+        let currentDate = new Date().toISOString().split('T')[0];
+
+        let hasEntryForCurrentDate = false;
+
+        for (let habitLog of habitLogsList) {
+            if (habitLog.trackedHabitID === trackedHabit._id && habitLog.date === currentDate) {
+                hasEntryForCurrentDate = true;
+                break;
+            }
+        }
+
+        if (!hasEntryForCurrentDate) {
+            checkReminder(trackedHabitName, trackedHabit.reminderTime);
+        }
+    }
+
+    if (notificationMessage.length > 0) {
+        showNotification('It is time to complete habits ' + notificationMessage);
     }
 }
 
-function checkReminder() {
-    const currentTime = Date.now();
-    if (currentTime >= reminderTime) {
-        // Create a message string and add habits user hasn't completed to the string
-        showNotification('Time to complete your habit!');
+function checkReminder(trackedhabitName, reminderTime) {
+    const now = new Date();
+    const currentHours = now.getHours();
+    const currentMinutes = now.getMinutes();
+
+    const [reminderHours, reminderMinutes] = reminderTime.split(':').map(Number);
+
+    // Check if the current time is equal to the reminder time
+    if (currentHours === reminderHours && currentMinutes === reminderMinutes) {
+        notificationMessage += trackedhabitName + ', ';
+    } else {
+        const timeDifferenceInMinutes = (currentHours * 60 + currentMinutes) - (reminderHours * 60 + reminderMinutes);
+        if (timeDifferenceInMinutes >= 5 && timeDifferenceInMinutes % 5 === 0) {
+            notificationMessage += trackedhabitName + ', ';
+        }
     }
 }
 
 function showNotification(message) {
     console.log('Requesting notification permission...');
     Notification.requestPermission().then(permission => {
-      console.log('Permission:', permission);
-      if (permission === 'granted') {
-        const notification = new Notification("Reminder", { 
-            body: message, 
-        })
-      }
-    })
-  }
-  
+        console.log('Permission:', permission);
+        if (permission === 'granted') {
+            const notification = new Notification("Reminder", {
+                body: message,
+            });
+        }
+    });
+}
+
 fetchReminderTimes();
 
-setInterval(() => {
-    fetchReminderTimes();
-    checkReminder();
-}, 60 * 1000);
+setInterval(fetchReminderTimes, 60 * 1000);
