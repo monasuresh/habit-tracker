@@ -106,7 +106,6 @@
                     const li = document.createElement('li');
                     li.className = 'list-group-item';
 
-                    // Display habit name, date, and time in the desired format
                     const dateTime = new Date(entry.dateTime);
                     const formattedDate = dateTime.toLocaleDateString();
                     const formattedTime = dateTime.toLocaleTimeString();
@@ -119,12 +118,6 @@
                 habitLog.appendChild(ul);
             }
         }
-
-        /*function addHabitEntry(habit, date, time) {
-            const dateTime = `${date}T${time}`;
-            habitLogData.push({ habit, dateTime });
-            displayHabitEntries(date);
-        } */
 
         const datePicker = document.getElementById('datePicker');
         datePicker.addEventListener('change', function () {
@@ -155,10 +148,9 @@
             errorContainer.textContent = message;
             errorContainer.style.display = 'block';
 
-            // Optionally, hide the error after a few seconds
             setTimeout(() => {
                 errorContainer.style.display = 'none';
-            }, 5000); // Adjust the timeout as needed
+            }, 5000);
         }
 
         function addHabitEntry() {
@@ -225,10 +217,6 @@
         $(document).ready(function () {
             populateHabitLogData();
         });
-
-        //const today = new Date().toISOString().split('T')[0];
-        //datePicker.value = today;
-        //displayHabitEntries(today);
     </script>
 
 </body>
