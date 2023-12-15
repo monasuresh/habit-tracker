@@ -35,91 +35,54 @@ form {
     font-weight: bold;
 }
 
-/*#habitListContainer {
-    max-height: 300px;
-    overflow-y: auto;
-    border: 1px solid #ccc;
+.habit-container {
+    background-color: #ffffff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 50px;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-#listOfAvailableHabits {
-    list-style: none;
-    padding: 0;
+.habit-h1 {
+    color: #007bff;
 }
 
-#listOfAvailableHabits li {
-    margin: 8px 0;
-}
-
-.custom-form {
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.custom-form .habit-container {
-    margin-bottom: 15px;
-}
-
-.custom-form .habit-container label {
-    display: block;
+.list-group-item {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
     margin-bottom: 5px;
 }
 
-.custom-form .habit-container input[type="time"] {
-    width: 150px;
+.list-group-item:hover {
+    background-color: #e2e6ea;
 }
 
-.custom-form button {
-    margin-top: 15px;
-    padding: 10px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.custom-form button:hover {
-    background-color: #45a049;
-}
-
-.container {
-    text-align: center;
-    margin-top: 100px;
-}
-
-.welcome-container {
-    background-color: #bd8a09;
-    color: #ffffff;
-    padding: 2rem;
-    border-radius: 15px;
-}
-
-.btn-container {
-    margin-top: 30px;
-}
-
-.btn-primary, .btn-success {
-    padding: 15px 30px;
-    font-size: 20px;
-    margin: 10px;
+.modal-content {
     border-radius: 10px;
 }
 
-.welcome-text {
-    font-size: 18px;
-    margin-bottom: 15px;
+.habits-label {
+    font-weight: bold;
 }
 
-.user-link {
-    display: inline-block;
-    margin-right: 15px;
-    text-decoration: none;
-    color: #3498db;
+.habit-log-container {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-top: 50px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-.custom-form {
+#habitLog {
     margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-} */
+}
+
+.habit-log-form {
+    margin-top: 20px;
+}

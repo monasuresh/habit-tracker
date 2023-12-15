@@ -45,7 +45,7 @@ router
     .route('/view-habit-log')
     .get(async (req, res) => {
         try {
-            return res.render('viewHabitLogs', { title: 'View Habit Logs' });
+            return res.render('viewHabitLogs', { title: 'Habit Log' });
         } catch (e) {
             return res.status(500).send(e);
         }

@@ -1,6 +1,7 @@
 import moment from 'moment';
 import { ObjectId } from 'mongodb';
 import { users } from './config/mongoCollections.js';
+import { habits } from './config/mongoCollections.js';
 
 const exportedMethods = {
   checkId(id, varName) {
@@ -117,9 +118,13 @@ const exportedMethods = {
       if (!name || !effect || !category || !weight) {
         throw 'All fields need to be provided';
       }
+    } else {
+      if (!name && !effect && !category && !weight) {
+        throw 'At least one field needs to be provided.';
+      }
     }
     
-    if ((name && typeof name !== 'string') || (effect && typeof effect !== 'string') || (category && typeof category !== 'string') || (weight && typeof weight !== 'string')) {
+    if ((name && typeof name !== 'string') || (effect && typeof effect !== 'string') || (category && typeof category !== 'string')) {
       throw 'Either the habit name, effect or category is not of type string. Those fields must be strings.';
     }
 
@@ -135,7 +140,7 @@ const exportedMethods = {
       category = category.trim().toLowerCase();
     }
 
-    if (weight) {
+    if (weight && (typeof weight === "string")) {
       weight = weight.trim();
     }
 
@@ -149,14 +154,13 @@ const exportedMethods = {
 
     if (weight) {
       weight = parseInt(weight, 10);
-    }
+      if (this.isNotValidNumber(weight)) {
+        throw 'The weight is not of type number.';
+      }
 
-    if (weight && this.isNotValidNumber(weight)) {
-      throw 'The weight is not of type number.';
-    }
-
-    if (weight && (!(weight >= 1 && weight <= 10) || !Number.isInteger(weight))) {
-      throw 'The weight must be a positive, whole number between 1 and 10.';
+      if ((!(weight >= 1 && weight <= 10) || !Number.isInteger(weight))) {
+        throw 'The weight must be a positive, whole number between 1 and 10.';
+      }
     }
 
     const habitNameRegex = /^[a-zA-Z0-9](?:[a-zA-Z0-9\s]{1,48}[a-zA-Z0-9])?$/;
@@ -172,12 +176,12 @@ const exportedMethods = {
     }
 
     const validCategories = [
-      "healthAndFitness",
-      "personalDevelopment",
+      "healthandfitness",
+      "personaldevelopment",
       "productivity",
       "financial",
       "relationships",
-      "careerDevelopment",
+      "careerdevelopment",
       "social",
       "organization",
       "hobbies"
@@ -186,7 +190,7 @@ const exportedMethods = {
 
     const validCategoriesString = `Valid Categories: ${validCategories.join(", ")}`;
 
-    const categoryRegex = /^(healthAndFitness|personalDevelopment|productivity|financial|relationships|careerDevelopment|social|organization|hobbies)$/i;
+    const categoryRegex = /^(healthandfitness|personaldevelopment|productivity|financial|relationships|careerdevelopment|social|organization|hobbies)$/i;
 
     if (category && !categoryRegex.test(category)) {
       throw validCategoriesString;
@@ -244,6 +248,15 @@ const exportedMethods = {
 
     if (!foundUser) {
       throw 'No user with the provided email address could be found.';
+    }
+  },
+
+  async checkForDuplicateHabitName(name) {
+    let habitCollection = await habits();
+    let duplicateHabit = await habitCollection.findOne({'name': name});
+
+    if (duplicateHabit) {
+        throw `A habit with the name ${name} already exists`;
     }
   }
 }

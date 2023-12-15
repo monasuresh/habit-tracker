@@ -8,6 +8,18 @@ const logHabit = async (emailAddress, trackedHabitName, date, time) => {
         throw 'All fields must be supplied';
     }
 
+    if (typeof trackedHabitName !== 'string') {
+        throw 'The tracked habit name must be of type string';
+    }
+
+    trackedHabitName = trackedHabitName.trim();
+
+    if (trackedHabitName.length === 0) {
+        throw 'The tracked habit name must not be a string with just empty spaces.';
+    }
+
+    trackedHabitName = trackedHabitName.toUpperCase();
+
     emailAddress = validation.validateEmailAddress(emailAddress);
 
     date = validation.isValidHyphenSeparatedDate(date);
@@ -47,7 +59,7 @@ const logHabit = async (emailAddress, trackedHabitName, date, time) => {
 
     const newLogEntry = {
         _id: newId,
-        trackedHabitName: trackedHabitName,
+        trackedHabitName: trackedHabitName.toUpperCase(),
         trackedHabitID: new ObjectId(trackedHabit.trackedHabits[0]._id),
         date: date,
         time: time

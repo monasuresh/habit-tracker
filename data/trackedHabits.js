@@ -103,6 +103,21 @@ const deleteTrackedHabit = async (emailAddress, trackedHabitID) => {
         throw 'No tracked habit found for the provided id.';
     }
 
+    let trackedHabits = await userCollection.find({ 'trackedHabits._id': new ObjectId(trackedHabitID) }, { projection: { _id: 0, 'trackedHabits.$': 1 } }).toArray();
+
+    for (const trackedHabit of trackedHabits) {
+        await userCollection.updateMany(
+            {},
+            {
+                $pull: {
+                    habitLog: {
+                        'trackedHabitID': trackedHabit.trackedHabits[0]._id
+                    }
+                }
+            }
+        );
+    }
+
     let deletedTrackedHabit = await userCollection.updateOne({ 'emailAddress': emailAddress, 'trackedHabits._id': new ObjectId(trackedHabitID) }, { $pull: { trackedHabits: { _id: new ObjectId(trackedHabitID) } } });
 
     if (!deletedTrackedHabit) {
