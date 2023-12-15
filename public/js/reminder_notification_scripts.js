@@ -60,7 +60,7 @@ function processReminderTimes() {
         let hasEntryForCurrentDate = false;
 
         for (let habitLog of habitLogsList) {
-            if (habitLog.trackedHabitID === trackedHabit._id && habitLog.date === currentDate) {
+            if (habitLog.trackedHabitID == trackedHabit._id && habitLog.date == currentDate) {
                 hasEntryForCurrentDate = true;
                 break;
             }

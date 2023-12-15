@@ -14,12 +14,9 @@ const createHabit = async (
     const habitCollection = await habits();
 
     validHabitParams.name = validHabitParams.name.toUpperCase();
+    validHabitParams.effect = validHabitParams.effect.toLowerCase();
 
-    let duplicateHabit = await habitCollection.findOne({'name': validHabitParams.name});
-
-    if (duplicateHabit) {
-        throw `A habit with the name ${name} already exists`;
-    }
+    await validation.checkForDuplicateHabitName(validHabitParams.name);
 
     // Create a new habit object
     const newHabit = {
@@ -64,27 +61,12 @@ const getAllHabits = async () => {
 
 const deleteHabit = async (habitId) => {
     habitId = validation.validateIdStrings(habitId);
-    /*emailAddress = validation.validateEmailAddress(emailAddress); */
-
-    // Checking to see if the email address can be found in the database
 
     const userCollection = await users();
-
-    //let foundEmailAddress = await userCollection.find({'emailAddress': emailAddress}, { projection: {_id: 0, 'emailAddress': 1}});
-
-    /*let foundEmailAddress = await userCollection.find({ 'emailAddress': emailAddress }, { projection: { _id: 0, 'emailAddress': 1 } }).toArray();
-
-    if (foundEmailAddress.length === 0) {
-        throw 'Either the user is not logged in or the email address could not be found in the database.';
-    } */
 
     const habitCollection = await habits();
 
     let trackedHabits = await userCollection.find({ 'trackedHabits.habitId': new ObjectId(habitId) }, { projection: { _id: 0, 'trackedHabits.$': 1 } }).toArray();
-
-    /*if (trackedHabits.length === 0) {
-        throw 'Could not find a tracked habit associated with that id';
-    } */
 
     for (const trackedHabit of trackedHabits) {
         await userCollection.updateMany(
@@ -118,29 +100,32 @@ const deleteHabit = async (habitId) => {
 };
 
 const modifyHabit = async (habitId, habitInfo) => {
-    if (!habitId) throw 'You must provide an id to search for';
-    let validHabitParams = validation.validateHabitParams(habitInfo.nameInput, habitInfo.effectInput, habitInfo.categoryInput, habitInfo.weightInput, true);
+    // Change to validate habitId string
+    habitId = validation.validateIdStrings(habitId);
+    let validHabitParams;
+
+    if (habitInfo.nameInput) {
+        validHabitParams = validation.validateHabitParams(habitInfo.nameInput, habitInfo.effectInput, habitInfo.categoryInput, habitInfo.weightInput, true);
+    } else {
+        validHabitParams = validation.validateHabitParams(habitInfo.name, habitInfo.effect, habitInfo.category, habitInfo.weight, true);
+    }
 
     let updatedHabit = {}
 
-    if (habitInfo.nameInput) {
-        updatedHabit.name = habitInfo.nameInput
+    if (validHabitParams.name) {
+        updatedHabit.name = validHabitParams.name.toUpperCase();
     }
 
-    if (habitInfo.effectInput) {
-        updatedHabit.effect = habitInfo.effectInput
+    if (validHabitParams.effect) {
+        updatedHabit.effect = validHabitParams.effect;
     }
 
-    if (habitInfo.categoryInput) {
-        updatedHabit.category = habitInfo.categoryInput
+    if (validHabitParams.category) {
+        updatedHabit.category = validHabitParams.category;
     }
 
-    if (habitInfo.categoryInput) {
-        updatedHabit.category = habitInfo.categoryInput
-    }
-
-    if (habitInfo.weightInput) {
-        updatedHabit.weight = habitInfo.weightInput
+    if (validHabitParams.weight) {
+        updatedHabit.weight = validHabitParams.weight;
     }
 
     const habitCollection = await habits();
@@ -150,7 +135,7 @@ const modifyHabit = async (habitId, habitInfo) => {
     );
 
     if (!updateInfo)
-        throw `Error: Update failed, could not find a user with id of ${id}`;
+        throw 'Update failed, could not find the requested habit.';
 
     return updateInfo;
 }
