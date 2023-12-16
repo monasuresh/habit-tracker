@@ -78,8 +78,8 @@ function submitModifyItemForm(itemId, validHabitParams) {
         function (updatedHabit) {
             // Success callback
             const updatedItemIndex = items.findIndex(i => i.id === itemId);
-            if (updatedItemIndex !== -1) {
-                items[updatedItemIndex].name = newName.toUpperCase();
+            if (updatedItemIndex !== -1 && validHabitParams.name) {
+                items[updatedItemIndex].name = validHabitParams.name.toUpperCase();
             }
 
             renderItems();
@@ -445,7 +445,7 @@ function isNotValidNumber(num) {
 
 function isValidTime24HourFormat(timeInput) {
     let isError = false;
-    
+
     if (typeof timeInput !== 'string') {
         isError = true;
         displayHabitLogError('The time must be a string.', 'trackHabitErrorContainer');

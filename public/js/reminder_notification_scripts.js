@@ -113,4 +113,4 @@ function showNotification(message) {
 
 fetchReminderTimes();
 
-setInterval(fetchReminderTimes, 60 * 1000);
+setInterval(fetchReminderTimes, 30 * 1000);
