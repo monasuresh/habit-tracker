@@ -11,6 +11,15 @@ const exportedMethods = {
 
     return id;
   },
+  checkOnlyId(id){
+    if (!id) throw `Error: You must provide a ${varName}`;
+    if (typeof id !== 'string') throw `Error:${varName} must be a string`;
+    id = id.trim();
+    if (id.length === 0)
+      throw `Error: ${varName} cannot be an empty string or just spaces`;
+
+    return id;
+  },
   isEmailValid(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -46,6 +55,39 @@ const exportedMethods = {
       throw `${name} should not be more than ${maxLength} characters long`;
     }
     return trimmedValue;
+  },
+
+  checkString(string) {
+    if (!string) throw "You didn't supplied firstname or lastname";
+    if (typeof string !== 'string') throw `${string} must be a string`;
+    string = string.trim();
+    if (string.length === 0) throw "Firstname or Lastname can not be blank";
+    if (string.split(" ").length > 1) throw "Cannot have spaces inside";
+    var letter = /^[a-zA-Z]+$/;
+    let result = string.match(letter);
+    if (!(result == string && typeof result === "object")) throw "Firstname or Lastname must contains alphabets";
+    if (!(string.length >= 2 && string.length <= 25)) throw "Firstname or Lastname should be at least 2 characters long with a max of 25 characters";
+    return string;
+  },
+
+  checkGroupString(string) {
+    if (!string) throw "You didn't supplied String";
+    if (typeof string !== 'string') throw `${string} must be a string`;
+    string = string.trim();
+    if (string.length === 0) throw "Group name can not be blank";
+    if (string.split(" ").length > 1) throw "Cannot have spaces inside";
+    if (!(string.length >= 2 && string.length <= 10)) throw "Group Name should be at least 2 characters long with a max of 10 characters";
+    return string;
+  },
+
+  checkIndividualString(string) {
+    if (!string) throw "You didn't supplied String";
+    if (typeof string !== 'string') throw `${string} must be a string`;
+    string = string.trim();
+    if (string.length === 0) throw "Challenge name can not be blank";
+    if (string.split(" ").length > 1) throw "Cannot have spaces inside";
+    if (!(string.length >= 2 && string.length <= 10)) throw "Challenge Name should be at least 2 characters long with a max of 10 characters";
+    return string;
   },
   //validate password
   validatePassword(password) {

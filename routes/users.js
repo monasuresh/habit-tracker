@@ -1,7 +1,7 @@
 import { Router } from 'express';
 const router = Router();
 import groupData from '../data/group.js';
-import { users } from '../config/mongoCollections.js';
+import { users, groups } from '../config/mongoCollections.js';
 
 router.get('/', async (req, res) => {
     console.log("I am in get users routes")
