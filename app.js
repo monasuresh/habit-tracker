@@ -135,6 +135,24 @@ app.use('/logout', (req, res, next) => {
   }
 });
 
+app.use('/habits/create-habit', (req, res, next) => {
+  // Redirect to login if not logged in
+  if (!req.session.user) {
+    res.redirect('/login');
+  } else {
+    next();
+  }
+});
+
+app.use('tracked-habits/view-habit-log', (req, res, next) => {
+  // Redirect to login if not logged in
+  if (!req.session.user) {
+    res.redirect('/login');
+  } else {
+    next();
+  }
+});
+
 // Configure other routes
 configRoutes(app);
 

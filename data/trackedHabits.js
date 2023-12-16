@@ -1,8 +1,31 @@
 import { ObjectId } from 'mongodb';
 import { habits } from '../config/mongoCollections.js';
 import { users } from '../config/mongoCollections.js';
+import validation from '../validation.js';
 
 const addTrackedHabit = async (emailAddress, habitId, reminderTime) => {
+    if (!emailAddress || !habitId || !reminderTime) {
+        throw 'All fields must be supplied';
+    }
+
+    habitId = validation.validateIdStrings(habitId);
+
+    emailAddress = validation.validateEmailAddress(emailAddress);
+
+    reminderTime = validation.isValidTime24HourFormat(reminderTime);
+
+    // Check to see if there is a user with the specified email address. If not, throw an error.
+
+    await validation.checkIfEmailAddressExistsInDb(emailAddress);
+
+    const habitCollection = await habits();
+
+    let habit = await habitCollection.findOne({_id: new ObjectId(habitId)});
+
+    if (!habit) {
+        throw 'No habit exists for the requested habit';
+    }
+
     let newId = new ObjectId();
 
     const newTrackedHabit = {
@@ -53,7 +76,10 @@ const getAllTrackedHabits = async (emailAddress) => {
 };
 
 const getTrackedHabitById = async (trackedHabitId) => {
+    trackedHabitId = validation.validateIdStrings(trackedHabitId);
+
     const userCollection = await users();
+
     const trackedHabit = await userCollection.findOne(
         { 'trackedHabits._id': new ObjectId(trackedHabitId) },
         { projection: { _id: 0, 'trackedHabits.$': 1 } }
@@ -95,6 +121,14 @@ const getAllTrackedHabitsWithNames = async (emailAddress) => {
 };
 
 const deleteTrackedHabit = async (emailAddress, trackedHabitID) => {
+    if (!emailAddress) {
+        throw 'An email address must be provided.';
+    }
+
+    emailAddress = validation.validateEmailAddress(emailAddress);
+
+    await validation.checkIfEmailAddressExistsInDb(emailAddress);
+
     const userCollection = await users();
 
     const userByTrackedHabitId = await userCollection.findOne({ 'emailAddress': emailAddress, 'trackedHabits._id': new ObjectId(trackedHabitID) });

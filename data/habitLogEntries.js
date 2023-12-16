@@ -40,7 +40,7 @@ const logHabit = async (emailAddress, trackedHabitName, date, time) => {
     const habitCollection = await habits();
     const userCollection = await users();
 
-    let habit = await habitCollection.findOne({'name': trackedHabitName});
+    let habit = await habitCollection.findOne({ 'name': trackedHabitName });
 
     if (!habit) {
         throw 'No habit exists for the provided tracked habit name.';
@@ -49,7 +49,7 @@ const logHabit = async (emailAddress, trackedHabitName, date, time) => {
     let trackedHabit = await userCollection.findOne(
         { 'emailAddress': emailAddress, 'trackedHabits.habitId': habit._id },
         { projection: { _id: 0, 'trackedHabits.$': 1 } }
-      );
+    );
 
     if (!trackedHabit || trackedHabit.trackedHabits.length === 0) {
         throw 'The provided habit has not yet been tracked.';

@@ -31,8 +31,40 @@ function displayHabitEntries(date) {
 
 const datePicker = document.getElementById('datePicker');
 datePicker.addEventListener('change', function () {
+    let isError = false;
     const selectedDate = this.value;
-    displayHabitEntries(selectedDate);
+
+    let date = isValidHyphenSeparatedDate(selectedDate);
+
+     // Check if the input is not empty
+    if (typeof date !== 'string') {
+        isError = true;
+        displayHabitLogError('The date must be a string.');
+    }
+
+    date = date.trim();
+
+    if (!date) {
+        isError = true;
+        displayHabitLogError('The date cannot be an empty string or a string with just spaces.');
+    }
+
+    // Regular expression to match YYYY-MM-DD format
+    var dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+
+    if (!dateRegex.test(date)) {
+        isError = true;
+        displayHabitLogError('The date is invalid.');
+    }
+
+    // Parse the date using the Date object to check for validity
+    var parsedDate = new Date(date);
+    if (isNaN(parsedDate.getTime())) {
+        isError = true;
+        displayHabitLogError('The date is invalid.');
+    }
+
+    displayHabitEntries(date);
 });
 
 const habitForm = document.getElementById('habitForm');
@@ -41,11 +73,17 @@ habitForm.addEventListener('submit', function (event) {
     const habitInput = document.getElementById('habitInput');
     const dateInput = document.getElementById('dateInput');
     const timeInput = document.getElementById('timeInput');
-    const habit = habitInput.value;
+
+    const name = habitInput.value;
     const date = dateInput.value;
     const time = timeInput.value;
+    let validHabitLogParams = validateHabitLogParams(name, date, time);
 
-    addHabitEntry();
+    if (validHabitLogParams.isError === false) {
+        addHabitEntry(validHabitLogParams);
+    } else {
+        return;
+    }
 
     // Clear form inputs
     habitInput.value = '';
@@ -63,15 +101,10 @@ function displayHabitLogError(message) {
     }, 5000);
 }
 
-function addHabitEntry() {
-    const habitInput = document.getElementById('habitInput');
-    const dateInput = document.getElementById('dateInput');
-    const timeInput = document.getElementById('timeInput');
-
-    const name = habitInput.value;
-    const date = dateInput.value;
-    const time = timeInput.value;
-
+function addHabitEntry(validHabitLogParams) {
+    let name = validHabitLogParams.name;
+    let date = validHabitLogParams.date;
+    let time = validHabitLogParams.time;
     // Make an AJAX POST request
     $.ajax({
         type: 'POST',
@@ -82,7 +115,9 @@ function addHabitEntry() {
             dateInput: date,
             timeInput: time,
         }),
-        success: function (response) {
+    }).then(
+        function (response) {
+            // Success callback
             console.log('Habit entry added successfully:', response);
             const dateTime = `${date}T${time}`;
             habitLogData.push({ name, dateTime });
@@ -92,20 +127,22 @@ function addHabitEntry() {
             const changeEvent = new Event('change');
             datePicker.dispatchEvent(changeEvent);
         },
-        error: function (jqXHR, textStatus, errorThrown) {
+        function (jqXHR, textStatus, errorThrown) {
+            // Error callback
             // Handle error response
             let errorMessage = jqXHR.responseJSON.error;
             displayHabitLogError(errorMessage);
-        },
-    });
+        }
+    );
 }
 
 function populateHabitLogData() {
-    // Make an AJAX GET request to retrieve habit log entries
     $.ajax({
         type: 'GET',
         url: '/habits/log-habit',
-        success: function (response) {
+    }).then(
+        function (response) {
+            // Success callback
             habitLogData.length = 0; // Clear existing data
 
             for (let item of response) {
@@ -117,11 +154,97 @@ function populateHabitLogData() {
             const today = new Date().toISOString().split('T')[0];
             displayHabitEntries(today);
         },
-        error: function (xhr, status, error) {
-            console.error('Error retrieving habit log entries:', error);
-        },
-    });
+        function (xhr, status, error) {
+            let errorMessage = jqXHR.responseJSON.error;
+            displayHabitLogError(errorMessage);
+        }
+    );
 }
+
+function validateHabitLogParams(name, date, time) {
+    let isError = false;
+    
+    if (!name || !date || !time) {
+        displayHabitLogError('One or more fields were not supplied.');
+        isError = true;
+    }
+
+    if (typeof name !== 'string') {
+        displayHabitLogError('The tracked habit name must be of type string');
+        isError = true;
+    }
+
+    name = name.trim();
+
+    if (name.length === 0) {
+        displayHabitLogError('The tracked habit name must not be a string with just empty spaces.');
+        isError = true;
+    }
+
+    
+    date = isValidHyphenSeparatedDate(date);
+
+    time = isValidTime24HourFormat(time);
+
+    let dateTimeInput = new Date(date + 'T' + time);
+    let currentDateTime = new Date();
+
+    if (dateTimeInput > currentDateTime) {
+        displayHabitLogError('The date/time logged must be not after the current date/time.');
+        isError = true;
+    }
+
+    return {name, date, time, isError};
+}
+
+function isValidHyphenSeparatedDate(dateInput) {
+    // Check if the input is not empty
+    if (typeof dateInput !== 'string') {
+        displayHabitLogError('The date must be a string.');
+    }
+
+    dateInput = dateInput.trim();
+
+    if (!dateInput) {
+        displayHabitLogError('The date cannot be an empty string or a string with just spaces.');
+    }
+
+    // Regular expression to match YYYY-MM-DD format
+    var dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+
+    if (!dateRegex.test(dateInput)) {
+        displayHabitLogError('The date is invalid.');
+    }
+
+    // Parse the date using the Date object to check for validity
+    var parsedDate = new Date(dateInput);
+    if (isNaN(parsedDate.getTime())) {
+        displayHabitLogError('The date is invalid.');
+    }
+
+    return dateInput;
+}
+
+function isValidTime24HourFormat(timeInput) {
+    if (typeof timeInput !== 'string') {
+        displayHabitLogError('The time must be a string.');
+    }
+
+    timeInput = timeInput.trim();
+
+    if (!timeInput) {
+        displayHabitLogError('The time cannot be an empty string or a string with just spaces.');
+    }
+
+    const timeRegex = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
+
+    if (!timeRegex.test(timeInput)) {
+        displayHabitLogError('The time is invalid.');
+    }
+
+    return timeInput;
+}
+
 
 $(document).ready(function () {
     populateHabitLogData();
