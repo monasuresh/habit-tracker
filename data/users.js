@@ -92,12 +92,11 @@ const exportedMethods = {
     if (!ObjectId.isValid(userId)) {
       throw 'The user id is not a valid ObjectId.';
     }
-    console.log("I am in get by user id:", userId);
+    validation.checkOnlyId(userId);
     const userCollection = await users();
-    const users = await userCollection.findOne({ _id: new ObjectId(userId) });
-    console.log(users);
-    if (!users) throw 'No Users with that id';
-    return users;
+    const user = await userCollection.findOne({ _id: new ObjectId(userId) });
+    if (!user) throw 'No Users with that id';
+    return user;
   }
 
 };

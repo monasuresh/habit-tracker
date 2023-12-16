@@ -8,37 +8,17 @@ router.get('/', async (req, res) => {
   res.render('individual');
 });
 
-// router.post('/', async (req, res) => {
-//   //code here for POST
-//   console.log("I am in post request");
-//   const { groupname, habit, startdate, enddate, participate } = req.body;
-//   console.log("I am in post groups")
-//   try {
-//     //Here do validation for each field
-
-//     try {
-//       const group = await groupData.addGroups(groupname, habit, startdate, enddate, participate);
-//       if (group.insertedGroup === true) {
-//         res.status(200).render('challenges', { message: 'You have successfully added group.' })
-//       }
-
-//     } catch (e) {
-//       res.status(400).render('groups', { error: e, groupname: groupname, habit: habit, startdate: startdate, enddate: enddate, participate: participate });
-//     }
-//   }
-//   catch (e) {
-//     res.status(400).render('groups', { error: e });
-//   }
-// });
-
 router.post('/', async (req, res) => {
-  console.log("I am in post request");
   const { challengeNameInput, habitInput, startdateInput, enddateInput } = req.body;
-  console.log("---------------------");
-  console.log(req.body);
-
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res
+      .status(400)
+      .json({ error: 'There are no fields in the request\'s body' });
+  }
   try {
-    const individual = await individualData.addIndividual(challengeNameInput, habitInput, startdateInput, enddateInput, req.session.user.id);
+    const challengeName = validation.checkIndividualString(challengeNameInput);
+    const habit = validation.checkOnlyId(habitInput);
+    const individual = await individualData.addIndividual(challengeName, habit, startdateInput, enddateInput, req.session.user.id);
 
     if (individual.insertedGroup === true) {
       res.status(200).redirect('/challenges');
@@ -47,6 +27,18 @@ router.post('/', async (req, res) => {
     res.status(400).render('individual', { error: e, challengeNameInput, habitInput, startdateInput, enddateInput });
   }
 });
+
+router
+  .route('/delete-individual/:challengeId')
+  .delete(async (req, res) => {
+    try {
+      const challengeId = validation.checkOnlyId(req.params.challengeId);
+      const deletedChallenge = await individualData.deleteIndividualChallenge(challengeId);
+      return res.json(deletedChallenge);
+    } catch (e) {
+      return res.status(404).json({ error: e });
+    }
+  });
 
 
 export default router;

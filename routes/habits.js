@@ -289,7 +289,7 @@ router
     .route('/log-habit/:habitid')
     .get(async (req, res) => {
         try {
-            console.log("Habit id from get:-------", req.params.habitid);
+            validation.checkOnlyId(req.params.habitid);
             let habitlist = await habitData.getHabitById(req.params.habitid);
             console.log("Tracked habits:", habitlist._id);
             return res.render('grouphabit', { title: 'Log Group/Individual Habits', habitname: habitlist.name, habitid: habitlist._id, habitscore: habitlist.weight });
@@ -305,7 +305,7 @@ router
             isError = true;
             return res
                 .status(400)
-                .render('protected', { title: 'Welcome Page', message: 'There are no fields in the request body.', isError: isError });
+                .render('protected', { title: 'Habit track Page', message: 'There are no fields in the request body.', isError: isError });
         }
 
         try {
@@ -323,7 +323,7 @@ router
         } catch (e) {
             return res
                 .status(400)
-                .render('protected', { title: 'Welcome Page', message: 'One or more inputs are incorrect.', isError: isError });
+                .render('protected', { title: 'Habit track Page', message: 'One or more inputs are incorrect.', isError: isError });
         }
         // Handle the success case
         res.redirect('/success'); // Redirect to a success page or handle it as needed
@@ -333,10 +333,9 @@ router
     .route('/log-habit/individual/:habitid')
     .get(async (req, res) => {
         try {
-            console.log("Habit id from get:-------", req.params.habitid);
-            let habitlist = await habitData.getHabitById(req.params.habitid);
-            console.log("Tracked habits:", habitlist._id);
-            return res.render('individualhabit', { title: 'Log Group/Individual Habits', habitname: habitlist.name, habitid: habitlist._id, habitscore: habitlist.weight });
+            const habitId = validation.checkOnlyId(req.params.habitid);
+            let habitlist = await habitData.getHabitById(habitId);
+            return res.render('individualhabit', { title: 'Log Individual Habits', habitname: habitlist.name, habitid: habitlist._id, habitscore: habitlist.weight });
         } catch (e) {
             return res.status(404).json({ error: e });
         }
@@ -349,7 +348,7 @@ router
             isError = true;
             return res
                 .status(400)
-                .render('protected', { title: 'Welcome Page', message: 'There are no fields in the request body.', isError: isError });
+                .render('protected', { title: 'Individual Page', message: 'There are no fields in the request body.', isError: isError });
         }
         try {
             // Assuming that habitDocument.habitid is used to log habits based on the habitid parameter
@@ -358,7 +357,7 @@ router
         } catch (e) {
             return res
                 .status(400)
-                .render('protected', { title: 'Welcome Page', message: 'One or more inputs are incorrect.', isError: isError });
+                .render('protected', { title: 'Individual Page', message: 'One or more inputs are incorrect.', isError: isError });
         }
         // Handle the success case
         res.redirect('/success'); // Redirect to a success page or handle it as needed

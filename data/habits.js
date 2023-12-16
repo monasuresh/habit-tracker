@@ -38,15 +38,13 @@ const createHabit = async (
 };
 
 const getHabitById = async (habitId) => {
-    if (!habitId) throw 'You must provide an id to search for';
 
+    if (!habitId) throw 'You must provide an id to search for';
     if (!ObjectId.isValid(habitId)) {
         throw 'The habit id is not a valid ObjectId.';
     }
-    console.log("I am in get by id:",habitId);
     const habitCollection = await habits();
     const habit = await habitCollection.findOne({ _id: new ObjectId(habitId) });
-    console.log(habit);
     if (!habit) throw 'No habit with that id';
     return habit;
 };

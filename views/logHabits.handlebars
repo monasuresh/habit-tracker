@@ -1,0 +1,16 @@
+<form action="/habits/log-habit" method="POST" id="create-habit-form">
+    <label for="habitNameInput" class="habit-input">Habit Name</label>
+    <select id="habitNameInput" name="habitNameInput">
+        {{#each trackedHabitItems}}
+            <option value="{{this._id}}">{{@key}}</option>
+        {{/each}}
+    </select>
+    <label for="dateInput">Date: </label>
+    <input type="date" id="dateInput" name="dateInput">
+    <label for="timeInput">Time:</label>
+    <input type="time" id="timeInput" name="timeInput">
+    <input type="submit" class="search-button" value="Log Habit">
+</form>
+{{#if isError}}
+    <p class="error">{{error}}</p>
+{{/if}}

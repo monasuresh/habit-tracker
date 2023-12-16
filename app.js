@@ -26,24 +26,32 @@ const rewriteUnsupportedBrowserMethods = (req, res, next) => {
   next();
 };
 
-const ifEqualHelper = (a, b, options) => (a === b ? options.fn(this) : options.inverse(this));
+const ifEqualHelper = function (a, b, options) {
+  return String(a) === String(b) ? options.fn(this) : options.inverse(this);
+};
 
 const toHexStringHelper = function (objectId, options) {
-  if (objectId && objectId.toHexString) {
+  try {
+    if (objectId) {
       return objectId.toHexString();
+    }
+  } catch (error) {
+    console.error('Error converting ObjectId to hex string:', error);
   }
+
   if (options && options.inverse) {
-      return options.inverse(this);
+    return options.inverse(this);
   }
-  return '';
 };
 
 const hbs = exphbs.create({
-    helpers: {
-        ifEqual: ifEqualHelper,
-        toHexString: toHexStringHelper,
-    },
+  defaultLayout: 'main',
+  helpers: {
+    ifEqual: ifEqualHelper,
+    toHexString: toHexStringHelper,
+  },
 });
+
 
 app.use('/public', staticDir);
 app.use(express.json());

@@ -120,8 +120,7 @@ const getAllHabitLogEntries = async (emailAddress) => {
 };
 
 const postAllTrackedHabitsWithId = async (emailAddress, habitname, habitid, date, time, score) => {
-
-    if (!emailAddress || !habitname || !date || !time) {
+    if (!date || !time) {
         throw 'All fields must be supplied';
     }
 
@@ -131,27 +130,12 @@ const postAllTrackedHabitsWithId = async (emailAddress, habitname, habitid, date
 
     emailAddress = emailAddress.trim();
 
-    // Check to see if the email address exists in the database. If not, throw an error.
-
-    date = validation.isValidHyphenSeparatedDate(date);
-
-    time = validation.isValidTime24HourFormat(time);
-
     let dateTimeInput = new Date(date + 'T' + time);
     let currentDateTime = new Date();
 
     if (dateTimeInput > currentDateTime) {
         throw 'The date/time logged must be not after the current date/time.';
     }
-
-    //Checking to see if the current date/time combo is greater than the current time. If it is, it's invalid.
-
-    /*if (!ObjectId.isValid(trackedHabitID)) {
-        throw 'The provided tracked habit id is not a valid object Id.';
-    } */
-
-    console.log("I am in post tracking");
-
     const userCollection = await users();
     const groupCollection = await groups();
 
@@ -162,7 +146,6 @@ const postAllTrackedHabitsWithId = async (emailAddress, habitname, habitid, date
     }
 
     const existingHabitIndex = user.grouphabitlog.findIndex(entry => entry.habitname === habitname);
-    console.log(habitid);
     const existingGroup = await groupCollection.findOne({
         $and: [
             { 'participate': { $in: [user._id.toString()] } },
@@ -170,15 +153,11 @@ const postAllTrackedHabitsWithId = async (emailAddress, habitname, habitid, date
         ]
     });
 
-    console.log("Existing group:", existingGroup);
-
     const existingGroupScore = existingGroup.score;
 
     if (existingHabitIndex !== -1) {
-        // If habitname already exists, update date and time
-        //console.log("Habit name", user.grouphabitlog.existingHabitIndex.habitname);
+
         const existingTotalScore = parseInt(user.grouphabitlog[existingHabitIndex].totalScore);
-        console.log("Existing score", existingTotalScore);
         const numScore = parseInt(score)
         const newTotalScore = existingTotalScore + numScore;
         const newGroupScore = existingGroupScore + numScore;
@@ -200,10 +179,7 @@ const postAllTrackedHabitsWithId = async (emailAddress, habitname, habitid, date
             { 'emailAddress': emailAddress, 'grouphabitlog.habitname': habitname },
             updatedHabitLog
         );
-        console.log(habitid);
-        console.log(updatedHabitLog);
 
-        console.log("Before update", user._id.toString());
         try {
             const groupScore = await groupCollection.updateOne(
                 {
@@ -214,7 +190,7 @@ const postAllTrackedHabitsWithId = async (emailAddress, habitname, habitid, date
                 },
                 { $set: { 'score': newGroupScore } }
             );
-            console.log("after update", groupScore);
+            if (!groupScore) throw 'Group score is not updated';
         }
         catch (e) {
             console.log("Error: ", e);
@@ -224,9 +200,7 @@ const postAllTrackedHabitsWithId = async (emailAddress, habitname, habitid, date
         }
         return { updatedGroupHabits: true };
     } else {
-        // If habitname does not exist, add a new entry
         let newId = new ObjectId();
-        console.log("Score------", score);
         const newScore = parseInt(score);
         const newGroupScore = existingGroupScore + newScore;
         const habitLog = {
@@ -245,8 +219,6 @@ const postAllTrackedHabitsWithId = async (emailAddress, habitname, habitid, date
         if (!updateResult) {
             throw 'Could not update user group habit successfully';
         }
-        console.log("Habit id-----", habitid);
-        console.log("Before update", user._id.toString());
         try {
             const groupScore = await groupCollection.updateOne(
                 {
@@ -257,7 +229,7 @@ const postAllTrackedHabitsWithId = async (emailAddress, habitname, habitid, date
                 },
                 { $set: { 'score': newGroupScore } }
             );
-            console.log("after update", groupScore);
+            if (!groupScore) throw 'Group score not updated'
         }
         catch (e) {
             console.log("Error: ", e);
@@ -280,11 +252,9 @@ const postLogHabitsForIndividualChallenge = async (emailAddress, habitname, habi
 
     emailAddress = emailAddress.trim();
 
-    // Check to see if the email address exists in the database. If not, throw an error.
-
-    date = validation.isValidHyphenSeparatedDate(date);
-
-    time = validation.isValidTime24HourFormat(time);
+    const userCollection = await users();
+    const emailInfo = await userCollection.findOne({ emailAddress: emailAddress });
+    if (!emailInfo) throw 'Email Address is not in database';
 
     let dateTimeInput = new Date(date + 'T' + time);
     let currentDateTime = new Date();
@@ -293,15 +263,6 @@ const postLogHabitsForIndividualChallenge = async (emailAddress, habitname, habi
         throw 'The date/time logged must be not after the current date/time.';
     }
 
-    //Checking to see if the current date/time combo is greater than the current time. If it is, it's invalid.
-
-    /*if (!ObjectId.isValid(trackedHabitID)) {
-        throw 'The provided tracked habit id is not a valid object Id.';
-    } */
-
-    console.log("I am in post tracking");
-
-    const userCollection = await users();
     const individualCollection = await individual();
 
     const user = await userCollection.findOne({ 'emailAddress': emailAddress });
@@ -311,7 +272,6 @@ const postLogHabitsForIndividualChallenge = async (emailAddress, habitname, habi
     }
 
     const existingHabitIndex = user.individualhabitlog.findIndex(entry => entry.habitname === habitname);
-    console.log(habitid);
     const existingIndividualChallenge = await individualCollection.findOne({
         $and: [
             { 'userId': user._id.toString() },
@@ -319,15 +279,11 @@ const postLogHabitsForIndividualChallenge = async (emailAddress, habitname, habi
         ]
     });
 
-    console.log("Existing group:", existingIndividualChallenge);
-
     const existingIndividualChallengeScore = existingIndividualChallenge.score;
 
     if (existingHabitIndex !== -1) {
-        // If habitname already exists, update date and time
-        //console.log("Habit name", user.grouphabitlog.existingHabitIndex.habitname);
+
         const existingTotalScore = parseInt(user.individualhabitlog[existingHabitIndex].totalScore);
-        console.log("Existing score", existingTotalScore);
         const numScore = parseInt(score)
         const newTotalScore = existingTotalScore + numScore;
         const newIndividualScore = existingIndividualChallengeScore + numScore;
@@ -349,10 +305,7 @@ const postLogHabitsForIndividualChallenge = async (emailAddress, habitname, habi
             { 'emailAddress': emailAddress, 'individualhabitlog.habitname': habitname },
             updatedHabitLog
         );
-        console.log(habitid);
-        console.log(updatedHabitLog);
 
-        console.log("Before update", user._id.toString());
         try {
             const IndividualScore = await individualCollection.updateOne(
                 {
@@ -363,7 +316,7 @@ const postLogHabitsForIndividualChallenge = async (emailAddress, habitname, habi
                 },
                 { $set: { 'score': newIndividualScore } }
             );
-            console.log("after update", IndividualScore);
+            if (!IndividualScore) throw 'Invidual score is not updated!'
         }
         catch (e) {
             console.log("Error: ", e);
@@ -373,9 +326,7 @@ const postLogHabitsForIndividualChallenge = async (emailAddress, habitname, habi
         }
         return { updatedIndividualChallengeHabits: true };
     } else {
-        // If habitname does not exist, add a new entry
         let newId = new ObjectId();
-        console.log("Score------", score);
         const newScore = parseInt(score);
         const newIndividualScore = existingIndividualChallengeScore + newScore;
         const habitLog = {
@@ -394,8 +345,6 @@ const postLogHabitsForIndividualChallenge = async (emailAddress, habitname, habi
         if (!updateResult) {
             throw 'Could not update user group habit successfully';
         }
-        console.log("Habit id-----", habitid);
-        console.log("Before update", user._id.toString());
         try {
             const individualScore = await individualCollection.updateOne(
                 {
@@ -406,7 +355,7 @@ const postLogHabitsForIndividualChallenge = async (emailAddress, habitname, habi
                 },
                 { $set: { 'score': newIndividualScore } }
             );
-            console.log("after update", individualScore);
+            if (!individualScore) throw 'Individual score does not updated!'
         }
         catch (e) {
             console.log("Error: ", e);
@@ -416,70 +365,10 @@ const postLogHabitsForIndividualChallenge = async (emailAddress, habitname, habi
 
 };
 
-const postScore = async (emailAddress, score, habitname) => {
-    const userCollection = await users();
-    const groupCollection = await groups();
-
-    const user = await userCollection.findOne({ 'emailAddress': emailAddress });
-
-    if (!user) {
-        throw new Error('User not found');
-    }
-    console.log("User collection: ", user);
-    console.log(habitname);
-
-    const existingHabitIndex = user.grouphabitlog.findIndex(entry => entry.habitname === habitname);
-    console.log(existingHabitIndex);
-    console.log("log: ", user.grouphabitlog[existingHabitIndex].log);
-    //const newGroupScore = user.grouphabitlog.reduce((totalScore, entry) => totalScore + entry.score, 0);
-    const newScore = user.grouphabitlog[existingHabitIndex].log.reduce((total, entry) => total + entry.score, 0) + score;
-
-    console.log(newScore);
-
-    const updatedHabitLog = {
-        $set: {
-            [`grouphabitlog.${existingHabitIndex}.totalscore`]: newScore
-        }
-    };
-
-    const userScore = await userCollection.updateOne(
-        {
-            'emailAddress': emailAddress,
-            'grouphabitlog.habitname': habitname
-        },
-        updatedHabitLog
-    );
-
-    // Update group's score (assuming 'participate' is the correct field)
-    //console.log(user._id);
-    console.log("Before update", user._id.toString());
-    try {
-        const groupScore = await groupCollection.updateOne(
-            { 'participate': { $in: [user._id.toString()] } },
-            { $set: { 'score': newScore } }
-        );
-        console.log("after update", groupScore);
-    }
-    catch (e) {
-        console.log("Error: ", e);
-    }
-
-    //const userScore = await userCollection.updateOne({ grouphabitlog_id: user.grouphabitlog.id }, { $set: { score: newGroupScore } });
-
-    //const groupScore = await groupCollection.updateOne({ participate: user.id }, { $set: { score: newGroupScore } });
-
-    if (!groupScore) throw 'Group score is not updated';
-    if (!userScore) throw 'User score is not updated';
-
-    return { updatedScore: true };
-
-};
-
 export default {
     logHabit,
     getAllHabitLogEntries,
     getHabitLogEntryById,
     postAllTrackedHabitsWithId,
-    postScore,
     postLogHabitsForIndividualChallenge
 };

@@ -11,11 +11,10 @@ Challenges handelbars
     <form action="/challenges" id="challenges-form" method="GET">
         <p>Hello This is challenges Page!</p>
         <p>You are part of below challanges</p>
-
-        <h2>Your Groups:</h2>
-        {{#if groupDataRet}}
-        {{#each groupDataRet}}
+        <!-- Assuming this is inside a loop for each group -->
+        <h2>Your Groups Challenges:</h2>
         <p>
+            {{#each groupDataRet}}
             Group Name: {{groupname}}
             <br>
             Habit: {{#with (lookup ../habitDataRet @index)}}
@@ -28,20 +27,29 @@ Challenges handelbars
             <br>
             Score: {{score}}
             <br>
-            ID: {{toHexString _id}}
-            <label for="owner" id="owner" value="{{owner}}"></label>
-            <a href="/habits/log-habit/{{habit}}">Track Habits</a> <br>
-            {{#ifEqual admin ../user.id}}
-             {{!-- <a href="#" onclick="deleteGroup('{{toHexString _id}}')">Delete</a> --}}
-            <a href="/groups/delete-group/{{toHexString _id}}">Delete</a>
-            {{/ifEqual}}
-        </p>
-        </div>
+            <input type="hidden" id="enddate_{{id}}" name="enddate" value="{{enddate}}">
+            <input type="hidden" id="groupid_{{_id}}" name="groupid" value="{{_id}}">
+            <a href="#" id="addUserLink_{{_id}}" class="add-user-link">Add User</a><br>
 
-        {{/each}}
-        {{else}}
-        <p>No group data available.</p>
-        {{/if}}
+            <div id="userDropdown_{{_id}}" class="hidden">
+                <label for="userSelect_{{_id}}">Select User:</label>
+                <select id="userSelect_{{_id}}" name="selectedUserId">
+                    <!-- Options will be populated dynamically using JavaScript -->
+                </select>
+                <button id="submitUserButton_{{_id}}" class="submit-user-button">Add</button>
+            </div>
+            <a href="/habits/log-habit/{{habit}}" id="log-habit_{{_id}}">Track Habits</a><br>
+
+            {{#ifEqual admin ../user.id}}
+            <a href="#" onclick="deleteGroup('{{toHexString _id}}', event);">Delete Group</a><br>
+            {{else}}
+            <a href="#" onclick="deleteUser('{{../user.id}}','{{toHexString _id}}', event);">Exit from group</a><br>
+            {{/ifEqual}}
+
+            {{/each}}
+        </p>
+
+
 
         <h2>Your Individual Challenges:</h2>
         {{#if individualDataRet}}
@@ -59,12 +67,17 @@ Challenges handelbars
             <br>
             Score: {{score}}
             <br>
-            <a href="/habits/log-habit/individual/{{habit}}">Track Habits</a>
+            <a href="/habits/log-habit/individual/{{habit}}">Track Habits</a><br>
+            <a href="#" onclick="deleteIndividualChallenge('{{toHexString _id}}', event);">Delete</a>
         </p>
         {{/each}}
         {{else}}
         <p>No individual challenges data available.</p>
         {{/if}}
-        <div id="error"></div>
+
+        <div id="error">
+            <p>{{error}}</p>
+        </div>
     </form>
+
 </main>
