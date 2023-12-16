@@ -4,6 +4,7 @@ import { trackedHabitData } from '../data/index.js';
 import { habitLogData } from '../data/index.js';
 import validation from '../validation.js';
 import { habits } from '../config/mongoCollections.js';
+import { ObjectId } from 'mongodb';
 
 const router = express.Router();
 
@@ -47,7 +48,6 @@ router
     });
 
 router.route('/track/:habitId').post(async (req, res) => {
-    let isError = false;
     const habitDocument = req.body;
     if (!habitDocument || Object.keys(habitDocument).length === 0) {
         isError = true;
@@ -56,12 +56,62 @@ router.route('/track/:habitId').post(async (req, res) => {
             .render('protected', { title: 'Welcome Page', message: 'There are no fields in the request body.', isError: isError });
     }
 
+    let habitId = req.params.habitId;
+
+    let emailAddress;
+    if (!req.session.user) {
+        return res.status(401).json({ error: 'The current user is unauthorized.' });
+    } else {
+        emailAddress = req.session.user.emailAddress;
+    }
+
     try {
-        const trackedHabit = await trackedHabitData.addTrackedHabit(req.session.user.emailAddress, req.params.habitId, req.body.reminderTimeInput);
+        habitId = validation.validateIdStrings(habitId);
+    } catch (error) {
+        return res.status(400).json({error: error});
+    }
+
+    if (!emailAddress) {
+        return res.status(404).json({error: 'User has not been registered with an email address.'});
+    }
+
+    try {
+        emailAddress = validation.validateEmailAddress(emailAddress);
+    } catch (error) {
+        return res.status(400).json({error: error});
+    }
+
+    let time;
+
+    try {
+        time = validation.isValidTime24HourFormat(habitDocument.reminderTimeInput);
+    } catch (error) {
+        res.status(400).json({error: error});
+    }
+
+    // Check to see if there is a user with the specified email address. If not, throw an error.
+
+    try {
+        await validation.checkIfEmailAddressExistsInDb(emailAddress);
+    } catch (error) {
+        res.status(404).json({error: error});
+    }
+
+    const habitCollection = await habits();
+
+    let habit = await habitCollection.findOne({ _id: new ObjectId(habitId) });
+
+    if (!habit) {
+        return res.status(404).json({error: 'The habit you are trying to track could not be found'});
+    }
+
+    try {
+        const trackedHabit = await trackedHabitData.addTrackedHabit(emailAddress, habitId, time);
         return res.json(trackedHabit);
     } catch (e) {
-        return res.status(400).json({ error: e })
+        return res.status(500).json({ error: e })
     }
+
 });
 
 router
@@ -83,7 +133,7 @@ router
         try {
             deletionId = validation.validateIdStrings(deletionId);
         } catch (error) {
-            return res.status(400).json({error: error});
+            return res.status(400).json({ error: error });
         }
 
         try {
@@ -139,7 +189,7 @@ router
         let habit = await habitCollection.findOne({ 'name': trackedHabitName });
 
         if (!habit) {
-            res.status(404).json({error: 'No such habit exists in the global habit database.'});
+            res.status(404).json({ error: 'No such habit exists in the global habit database.' });
         }
 
         if (!emailAddress) {
@@ -210,7 +260,7 @@ router
         try {
             habitId = validation.validateIdStrings(habitId);
         } catch (error) {
-            return res.status(400).json({error: error});
+            return res.status(400).json({ error: error });
         }
 
         let validHabitParams;
@@ -218,7 +268,7 @@ router
         try {
             validHabitParams = validation.validateHabitParams(habitInfo.nameInput, habitInfo.effectInput, habitInfo.categoryInput, habitInfo.weightInput, true);
         } catch (error) {
-            return res.status(400).json({error: error});
+            return res.status(400).json({ error: error });
         }
 
         try {

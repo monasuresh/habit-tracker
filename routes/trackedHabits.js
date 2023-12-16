@@ -2,6 +2,9 @@ import { habitData } from '../data/index.js';
 import express from 'express';
 import { trackedHabitData } from '../data/index.js';
 import { habitLogData } from '../data/index.js';
+import validation from '../validation.js';
+import { users } from '../config/mongoCollections.js';
+import { ObjectId } from 'mongodb';
 
 const router = express.Router();
 
@@ -14,9 +17,6 @@ router
 
         let emailAddress = req.session.user.emailAddress;
 
-        /*if (!emailAddress) {
-            return res.status(400).
-        } */
         try {
             const trackedHabitList = await trackedHabitData.getAllTrackedHabits(emailAddress);
             return res.json(trackedHabitList);
@@ -29,9 +29,41 @@ router
     .route('/delete/:trackedHabitId')
     .delete(async (req, res) => {
         let habitToUntrackId = req.params.trackedHabitId;
+
         if (!habitToUntrackId || habitToUntrackId === 'undefined') {
             return res.status(404).json({error: 'Not Found: The habit to untrack is not yet tracked.'});
-            //return res.status(404).render('habits', { errorMessage: "Not Found: The habit to untrack is not yet tracked.", isError: isError });
+        }
+
+        let emailAddress;
+
+        if (!req.session.user) {
+            res.status(401).json({error: 'The user is not authorized to delete untrack the habit.'});
+        } else {
+            emailAddress = req.session.user.emailAddress;
+        }
+
+        if (!emailAddress) {
+            res.status(400).json({error: 'The email address was not provided.'});
+        }
+
+        try {
+            emailAddress = validation.validateEmailAddress(emailAddress);
+        } catch (error) {
+            res.status(400).json({error: error});
+        }
+    
+        try {
+            await validation.checkIfEmailAddressExistsInDb(emailAddress);
+        } catch (error) {
+            res.status(404).json({error: error});
+        }
+        
+        const userCollection = await users();
+    
+        const userByTrackedHabitId = await userCollection.findOne({ 'emailAddress': emailAddress, 'trackedHabits._id': new ObjectId(habitToUntrackId) });
+    
+        if (!userByTrackedHabitId) {
+            res.status(404).json({error: 'No tracked habit found for the provided id.'});
         }
 
         try {

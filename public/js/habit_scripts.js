@@ -34,59 +34,67 @@ function openModifyItemModal(itemId) {
     const item = items.find(i => i.id === itemId);
 
     const modifyItemForm = document.getElementById('modifyItemForm');
+
     modifyItemForm.addEventListener('submit', function (event) {
         event.preventDefault();
+
         const modifyNameInput = document.getElementById('modifyNameInput');
         const modifyEffectInput = document.getElementById('modifyEffectInput');
         const modifyCategoryInput = document.getElementById('modifyCategoryInput');
         const modifyWeightInput = document.getElementById('modifyWeightInput');
+
         const newName = modifyNameInput.value;
         const newEffect = modifyEffectInput.value;
         const newCategory = modifyCategoryInput.value;
         const newWeight = modifyWeightInput.value;
 
+        let validHabitParams = validateHabitParams(newName, newEffect, newCategory, newWeight, true, true);
+
         // Validate the input
-        /*if (newName.trim() === '' || newEffect.trim() === '' || newCategory.trim() === '' || newWeight.trim() === '') {
-            //showError('All fields must be filled.');
+        if (validHabitParams.isError === false) {
+            submitModifyItemForm(itemId, validHabitParams);
+        } else {
             return;
-        } */
-
-        // Make an AJAX request using jQuery
-        // Make an AJAX request using jQuery
-        $.ajax({
-            type: 'PATCH',
-            url: `/habits/modify/${itemId}`,
-            contentType: 'application/json',
-            data: JSON.stringify({
-                nameInput: newName,
-                effectInput: newEffect,
-                categoryInput: newCategory,
-                weightInput: newWeight,
-            }),
-        }).then(
-            function (updatedHabit) {
-                // Success callback
-                const updatedItemIndex = items.findIndex(i => i.id === itemId);
-                if (updatedItemIndex !== -1) {
-                    items[updatedItemIndex].name = updatedHabit.name;
-                }
-
-                renderItems();
-
-                $('#modifyItemModal').modal('hide');
-            },
-            function (jqXHR, textStatus, errorThrown) {
-                // Error callback
-                // Handle error response
-                let errorMessage = jqXHR.responseJSON.error;
-                displayHabitLogError(errorMessage, 'modifyHabitErrorContainer');
-            }
-        );
+        }
 
     });
 
     $('#modifyItemModal').modal('show');
 }
+
+function submitModifyItemForm(itemId, validHabitParams) {
+    // Make an AJAX request using jQuery
+    $.ajax({
+        type: 'PATCH',
+        url: `/habits/modify/${itemId}`,
+        contentType: 'application/json',
+        data: JSON.stringify({
+            nameInput: validHabitParams.name,
+            effectInput: validHabitParams.effect,
+            categoryInput: validHabitParams.category,
+            weightInput: validHabitParams.weight,
+        }),
+    }).then(
+        function (updatedHabit) {
+            // Success callback
+            const updatedItemIndex = items.findIndex(i => i.id === itemId);
+            if (updatedItemIndex !== -1) {
+                items[updatedItemIndex].name = newName.toUpperCase();
+            }
+
+            renderItems();
+
+            $('#modifyItemModal').modal('hide');
+        },
+        function (jqXHR, textStatus, errorThrown) {
+            // Error callback
+            // Handle error response
+            let errorMessage = jqXHR.responseJSON.error;
+            displayHabitLogError(errorMessage, 'modifyHabitErrorContainer');
+        }
+    );
+}
+
 
 function deleteHabitOnServer(itemId) {
     // Make an AJAX request using jQuery
@@ -137,6 +145,7 @@ function addItem(newItemName) {
 }
 
 document.getElementById('addItemForm').addEventListener('submit', async function (event) {
+    // Prevent the default form submission behavior
     event.preventDefault();
 
     const createNameInput = document.getElementById('createNameInput').value;
@@ -144,15 +153,26 @@ document.getElementById('addItemForm').addEventListener('submit', async function
     const createCategoryInput = document.getElementById('createCategoryInput').value;
     const createWeightInput = document.getElementById('createWeightInput').value;
 
+    let validHabitParams = validateHabitParams(createNameInput, createEffectInput, createCategoryInput, createWeightInput, false, false);
+
+    // Validate the input
+    if (validHabitParams.isError === false) {
+        submitAddItemForm(validHabitParams);
+    } else {
+        return;
+    }
+});
+
+function submitAddItemForm(validHabitParams) {
     let requestConfig = {
         type: 'POST',
         url: '/habits/create-habit',
         contentType: 'application/json',
         data: JSON.stringify({
-            nameInput: createNameInput,
-            effectInput: createEffectInput,
-            categoryInput: createCategoryInput,
-            weightInput: createWeightInput,
+            nameInput: validHabitParams.name,
+            effectInput: validHabitParams.effect,
+            categoryInput: validHabitParams.category,
+            weightInput: validHabitParams.weight,
         })
     }
 
@@ -178,12 +198,18 @@ document.getElementById('addItemForm').addEventListener('submit', async function
             displayHabitLogError(errorMessage, 'addItemErrorContainer');
         }
     );
-});
+}
 
 function trackHabitFormSubmit(event, itemId) {
     event.preventDefault();
 
     const reminderTimeInput = document.getElementById('reminderTimeInput').value;
+
+    let reminderTimeValidation = isValidTime24HourFormat(reminderTimeInput);
+
+    if (reminderTimeValidation.isError === true) {
+        return;
+    }
 
     // Make an AJAX request using jQuery
     $.ajax({
@@ -191,7 +217,7 @@ function trackHabitFormSubmit(event, itemId) {
         url: '/habits/track/' + itemId,
         contentType: 'application/json',
         data: JSON.stringify({
-            reminderTimeInput: reminderTimeInput,
+            reminderTimeInput: reminderTimeValidation.timeInput,
         }),
     }).then(
         function (response) {
@@ -305,6 +331,141 @@ function getHabitData() {
             displayHabitLogError(errorMessage, 'errorContainer');
         }
     );
+}
+
+function validateHabitParams(name, effect, category, weight, hasOptionalParams, isModify) {
+    // Habit name must start and end with alpha-numeric characters and be between 3 and 50 characters long
+    let errorContainerToUse;
+    let isError = false;
+
+    if (isModify) {
+        errorContainerToUse = 'modifyHabitErrorContainer';
+    } else {
+        errorContainerToUse = 'addItemErrorContainer';
+    }
+
+    if (hasOptionalParams === false) {
+        if (!name || !effect || !category || !weight) {
+            isError = true;
+            displayHabitLogError('All fields need to be provided', errorContainerToUse);
+        }
+    } else {
+        if (!name && !effect && !category && !weight) {
+            isError = true;
+            displayHabitLogError('At least one field needs to be provided.', errorContainerToUse);
+        }
+    }
+
+    if ((name && typeof name !== 'string') || (effect && typeof effect !== 'string') || (category && typeof category !== 'string')) {
+        isError = true;
+        displayHabitLogError('Either the habit name, effect or category is not of type string. Those fields must be strings.', errorContainerToUse);
+    }
+
+    if (name) {
+        name = name.trim();
+    }
+
+    if (effect) {
+        effect = effect.trim();
+    }
+
+    if (category) {
+        category = category.trim().toLowerCase();
+    }
+
+    if (weight && (typeof weight === "string")) {
+        weight = weight.trim();
+    }
+
+    if ((name && name.length === 0) || (effect && effect.length === 0) || (category && category.length === 0) || (weight && weight.length === 0)) {
+        isError = true;
+        displayHabitLogError('The name, effect, category, and weight must not be an empty string or a string with just spaces.', errorContainerToUse);
+    }
+
+    if (weight && !Number.isInteger(parseFloat(weight))) {
+        isError = true;
+        displayHabitLogError('The weight must be an integer.', errorContainerToUse);
+    }
+
+    if (weight) {
+        weight = parseInt(weight, 10);
+        if (this.isNotValidNumber(weight)) {
+            isError = true;
+            displayHabitLogError('The weight is not of type number.', errorContainerToUse);
+        }
+
+        if ((!(weight >= 1 && weight <= 10) || !Number.isInteger(weight))) {
+            isError = true;
+            displayHabitLogError('The weight must be a positive, whole number between 1 and 10.', errorContainerToUse);
+        }
+    }
+
+    const habitNameRegex = /^[a-zA-Z0-9](?:[a-zA-Z0-9\s]{1,48}[a-zA-Z0-9])?$/;
+
+    if (name && !habitNameRegex.test(name)) {
+        isError = true;
+        displayHabitLogError('The habit name must start and end with alphanumeric characters, must contain alphanumeric characters or spaces and be between 3 and 50 characters long', errorContainerToUse);
+    }
+
+    const effectRegex = /^(good|bad)$/i;
+
+    if (effect && !effectRegex.test(effect)) {
+        isError = true;
+        displayHabitLogError('The effect must either be good or bad', errorContainerToUse);
+    }
+
+    const validCategories = [
+        "healthandfitness",
+        "personaldevelopment",
+        "productivity",
+        "financial",
+        "relationships",
+        "careerdevelopment",
+        "social",
+        "organization",
+        "hobbies"
+    ];
+
+
+    const validCategoriesString = `Valid Categories: ${validCategories.join(", ")}`;
+
+    const categoryRegex = /^(healthandfitness|personaldevelopment|productivity|financial|relationships|careerdevelopment|social|organization|hobbies)$/i;
+
+    if (category && !categoryRegex.test(category)) {
+        isError = true;
+        displayHabitLogError(validCategoriesString, errorContainerToUse);
+    }
+
+    return { name, effect, category, weight, isError};
+}
+
+function isNotValidNumber(num) {
+    return typeof num !== 'number' || isNaN(num) || num === Infinity || num === -Infinity;
+}
+
+function isValidTime24HourFormat(timeInput) {
+    let isError = false;
+    
+    if (typeof timeInput !== 'string') {
+        isError = true;
+        displayHabitLogError('The time must be a string.', 'trackHabitErrorContainer');
+    }
+
+    timeInput = timeInput.trim();
+
+    if (!timeInput) {
+        isError = true;
+        displayHabitLogError('The time cannot be an empty string or a string with just spaces.', 'trackHabitErrorContainer');
+    }
+
+    const timeRegex = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
+
+    if (!timeRegex.test(timeInput)) {
+        isError = true;
+        displayHabitLogError('The time is invalid.', 'trackHabitErrorContainer');
+    }
+
+    return { timeInput, isError };
 }
 
 $(document).ready(function () {

@@ -55,12 +55,17 @@ function processReminderTimes() {
             }
         }
 
-        let currentDate = new Date().toISOString().split('T')[0];
+        let currentDate = new Date();
+        let year = currentDate.getFullYear();
+        let month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+        let day = currentDate.getDate().toString().padStart(2, '0');
+
+        let formattedDate = `${year}-${month}-${day}`;
 
         let hasEntryForCurrentDate = false;
 
         for (let habitLog of habitLogsList) {
-            if (habitLog.trackedHabitID == trackedHabit._id && habitLog.date == currentDate) {
+            if (habitLog.trackedHabitID == trackedHabit._id && habitLog.date == formattedDate) {
                 hasEntryForCurrentDate = true;
                 break;
             }
