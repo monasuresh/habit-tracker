@@ -1,0 +1,36 @@
+{{!--
+
+individual handelbars
+
+--}}
+<header>
+    <h1>Habit Tracker - Add individual challenges</h1>
+</header>
+
+<main>
+    <form action="/individual" id="individual-form" method="POST">
+        <div>
+            <label for="challengeNameInput">Challenge Name:</label>
+            <input type="text" id="challengeNameInput" name="challengeNameInput" placeholder="Enter Your Challenge Name">
+        </div>
+        <div>
+            <label for="habitInput">Select Habit:</label>
+            <select id="habitInput" name="habitInput">
+            </select>
+        </div>
+        <div>
+            <label for="startdateInput">Start Date:</label>
+            <input type="date" id="startdateInput" name="startdateInput" placeholder="Enter Start date">
+        </div>
+        <div>
+            <label for="enddateInput">End Date:</label>
+            <input type="date" id="enddateInput" name="enddateInput" placeholder="Enter End date">
+        </div>
+        <div>
+            <button type="submit" class="submitBtn" name="submitBtn">Add individual challenge</button>
+        </div>
+        <div id="error">
+            <p>{{error}}</p>
+        </div>
+    </form>
+</main>

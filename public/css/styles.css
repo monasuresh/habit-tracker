@@ -4,6 +4,10 @@ body {
     margin: 20px;
 }
 
+.hidden {
+    display: none;
+}
+
 header {
     text-align: center;
     color:#1915eb;
@@ -12,6 +16,10 @@ header {
 footer {
     margin-top: 50px;
     text-align: center;
+}
+
+canvas {
+    border: 1px solid #ccc;
 }
 
 button {

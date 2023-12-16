@@ -1,0 +1,112 @@
+{{!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .habit-form {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 300px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .habit-label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .habit-input,
+        .habit-input,
+        .habit-input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .create-habit-button {
+            background-color: #4caf50;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .create-habit-button:hover {
+            background-color: #45a049;
+        }
+
+        .error-message {
+            color: #ff0000;
+            margin-top: 10px;
+        }
+    </style>
+</head> --}}
+<body>
+
+    <form action="/habits/create-habit" method="POST" id="create-habit-form" class="habit-form">
+        <div class="form-group">
+            <label for="nameInput" class="habit-label">Name</label>
+            <input type="text" id="nameInput" name="nameInput" class="habit-input" placeholder="Enter habit name">
+        </div>
+
+        <div class="form-group">
+            <label for="effectInput" class="habit-label">Effect</label>
+            <select id="effectInput" name="effectInput" class="habit-input">
+                <option value="good">Good</option>
+                <option value="bad">Bad</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="categoryInput" class="habit-label">Category</label>
+            <select id="categoryInput" name="categoryInput" class="habit-input">
+                <option value="healthAndFitness">Health and Fitness</option>
+                <option value="personalDevelopment">Personal Development</option>
+                <option value="productivity">Productivity</option>
+                <option value="financial">Financial</option>
+                <option value="relationships">Relationships</option>
+                <option value="careerDevelopment">Career Development</option>
+                <option value="social">Social</option>
+                <option value="organization">Organization</option>
+                <option value="hobbies">Hobbies</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="weightInput" class="habit-label">Weight</label>
+            <input type="text" id="weightInput" name="weightInput" class="habit-input" placeholder="Enter habit weight">
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="create-habit-button">Create Habit</button>
+        </div>
+    </form>
+
+    {{#if isError}}
+        <p class="error-message">{{message}}</p>
+    {{/if}}
+
+</body>
+{{!-- </html> --}}

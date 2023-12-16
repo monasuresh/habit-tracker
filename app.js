@@ -7,6 +7,7 @@ import exphbs from 'express-handlebars';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import validate from './validation.js';
+import { users } from './config/mongoCollections.js'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -25,12 +26,39 @@ const rewriteUnsupportedBrowserMethods = (req, res, next) => {
   next();
 };
 
+const ifEqualHelper = function (a, b, options) {
+  return String(a) === String(b) ? options.fn(this) : options.inverse(this);
+};
+
+const toHexStringHelper = function (objectId, options) {
+  try {
+    if (objectId) {
+      return objectId.toHexString();
+    }
+  } catch (error) {
+    console.error('Error converting ObjectId to hex string:', error);
+  }
+
+  if (options && options.inverse) {
+    return options.inverse(this);
+  }
+};
+
+const hbs = exphbs.create({
+  defaultLayout: 'main',
+  helpers: {
+    ifEqual: ifEqualHelper,
+    toHexString: toHexStringHelper,
+  },
+});
+
+
 app.use('/public', staticDir);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(rewriteUnsupportedBrowserMethods);
 
-app.engine('handlebars', exphbs.engine({ defaultLayout: 'main' }));
+app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 
 app.use(
@@ -136,6 +164,36 @@ app.use('/logout', (req, res, next) => {
 });
 
 app.use('/habits/create-habit', (req, res, next) => {
+app.use('/groups', (req, res, next) => {
+  console.log(`[${new Date().toUTCString()}]: ${req.method} ${req.originalUrl} (${req.session.user ? 'Authenticated User' : 'Non-Authenticated User'})`);
+  // Redirect to login if not logged in
+  console.log("I am in groups");
+  if (!req.session.user) {
+    res.redirect('/login');
+  } else {
+    console.log("I am in next group")
+    next();
+  }
+  //console.log("I am out")
+  //next();
+});
+
+app.use('/users', (req, res, next) => {
+  console.log(`[${new Date().toUTCString()}]: ${req.method} ${req.originalUrl} (${req.session.user ? 'Authenticated User' : 'Non-Authenticated User'})`);
+  // Redirect to login if not logged in
+  console.log("I am in user");
+  if (!req.session.user) {
+    res.redirect('/login');
+  } else {
+    console.log("I am in next user")
+    next();
+  }
+  //console.log("I am out")
+  //next();
+});
+
+app.use('/challenges', (req, res, next) => {
+  console.log(`[${new Date().toUTCString()}]: ${req.method} ${req.originalUrl} (${req.session.user ? 'Authenticated User' : 'Non-Authenticated User'})`);
   // Redirect to login if not logged in
   if (!req.session.user) {
     res.redirect('/login');
@@ -152,6 +210,32 @@ app.use('tracked-habits/view-habit-log', (req, res, next) => {
     next();
   }
 });
+
+    console.log("I am in challenges")
+    next();
+  }
+  //console.log("I am out")
+  //next();
+});
+
+app.use('/individual', (req, res, next) => {
+  console.log(`[${new Date().toUTCString()}]: ${req.method} ${req.originalUrl} (${req.session.user ? 'Authenticated User' : 'Non-Authenticated User'})`);
+  // Redirect to login if not logged in
+  console.log("I am in individual");
+  if (!req.session.user) {
+    res.redirect('/login');
+  } else {
+    console.log("I am in next individual")
+    next();
+  }
+  //console.log("I am out")
+  //next();
+});
+
+
+
+
+
 
 // Configure other routes
 configRoutes(app);

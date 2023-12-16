@@ -94,7 +94,7 @@ router
         //console.log('Login POST - user: '+user.emailAddress);
         if (user.emailAddress === emailAddress) {
           //console.log('Login POST - email: '+emailAddress+' MATCHES!!!');
-          req.session.user = { firstName: user.firstName, lastName: user.lastName, emailAddress: user.emailAddress, role: user.role };
+          req.session.user = { id: user._id, firstName: user.firstName, lastName: user.lastName, emailAddress: user.emailAddress, role: user.role };
           if (user.role === "admin") {
             res.redirect('/admin');
           } else {
@@ -149,6 +149,7 @@ router.route('/protected').post(async (req, res) => {
       .status(400)
       .render('protected', { title: 'Welcome Page', message: 'One or more inputs are incorrect.', isError: isError });
   }
+  res.render('protected', { firstName: req.session.user.firstName, lastName: req.session.user.lastName, currentTime: currentTime, role: req.session.user.role });
 });
 
 router.route('/admin').get(async (req, res) => {

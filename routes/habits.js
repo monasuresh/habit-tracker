@@ -19,6 +19,7 @@ router
     })
     .post(async (req, res) => {
         //code here for POST
+        console.log("I am in post create habit");
         const habitDocument = req.body;
         let validHabitParams;
         if (!habitDocument || Object.keys(habitDocument).length === 0) {
@@ -119,6 +120,7 @@ router
     .get(async (req, res) => {
         try {
             const habitList = await habitData.getAllHabits();
+            console.log("I am in view all")
             return res.json(habitList);
         } catch (e) {
             return res.status(500).send(e);
@@ -281,6 +283,84 @@ router
         } catch (e) {
             return res.status(404).send({ error: e });
         }
+    });
+
+router
+    .route('/log-habit/:habitid')
+    .get(async (req, res) => {
+        try {
+            validation.checkOnlyId(req.params.habitid);
+            let habitlist = await habitData.getHabitById(req.params.habitid);
+            console.log("Tracked habits:", habitlist._id);
+            return res.render('grouphabit', { title: 'Log Group/Individual Habits', habitname: habitlist.name, habitid: habitlist._id, habitscore: habitlist.weight });
+        } catch (e) {
+            return res.status(404).json({ error: e });
+        }
+    })
+    .post(async (req, res) => {
+        let isError = false;
+        const habitDocument = req.body;
+
+        if (!habitDocument || Object.keys(habitDocument).length === 0) {
+            isError = true;
+            return res
+                .status(400)
+                .render('protected', { title: 'Habit track Page', message: 'There are no fields in the request body.', isError: isError });
+        }
+
+        try {
+
+            // Assuming that habitDocument.habitid is used to log habits based on the habitid parameter
+            await habitLogData.postAllTrackedHabitsWithId(req.session.user.emailAddress, habitDocument.habitname, habitDocument.habitid, habitDocument.date, habitDocument.time, habitDocument.habitscore);
+
+            console.log("habit id:", habitDocument.habitid);
+
+            //let habitlist = await habitData.getHabitById(habitDocument.habitid);
+
+            //await habitLogData.postScore(req.session.user.emailAddress, habitlist.weight, habitlist.name)
+            // Log the habit based on the habitid parameter
+            // Adjust the arguments based on your logHabit function requirements
+        } catch (e) {
+            return res
+                .status(400)
+                .render('protected', { title: 'Habit track Page', message: 'One or more inputs are incorrect.', isError: isError });
+        }
+        // Handle the success case
+        res.redirect('/success'); // Redirect to a success page or handle it as needed
+    });
+
+router
+    .route('/log-habit/individual/:habitid')
+    .get(async (req, res) => {
+        try {
+            const habitId = validation.checkOnlyId(req.params.habitid);
+            let habitlist = await habitData.getHabitById(habitId);
+            return res.render('individualhabit', { title: 'Log Individual Habits', habitname: habitlist.name, habitid: habitlist._id, habitscore: habitlist.weight });
+        } catch (e) {
+            return res.status(404).json({ error: e });
+        }
+    })
+    .post(async (req, res) => {
+        let isError = false;
+        const habitDocument = req.body;
+
+        if (!habitDocument || Object.keys(habitDocument).length === 0) {
+            isError = true;
+            return res
+                .status(400)
+                .render('protected', { title: 'Individual Page', message: 'There are no fields in the request body.', isError: isError });
+        }
+        try {
+            // Assuming that habitDocument.habitid is used to log habits based on the habitid parameter
+            await habitLogData.postLogHabitsForIndividualChallenge(req.session.user.emailAddress, habitDocument.habitname, habitDocument.habitid, habitDocument.date, habitDocument.time, habitDocument.habitscore);
+
+        } catch (e) {
+            return res
+                .status(400)
+                .render('protected', { title: 'Individual Page', message: 'One or more inputs are incorrect.', isError: isError });
+        }
+        // Handle the success case
+        res.redirect('/success'); // Redirect to a success page or handle it as needed
     });
 
 export default router;

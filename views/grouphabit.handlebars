@@ -1,0 +1,15 @@
+<form action="/habits/log-habit/:habitid" method="POST" id="create-habit-form">
+    <label for="habitname" class="habit-input">Habit Name</label>
+    <span id="habitname">{{habitname}}</span>
+    <input type="hidden" name="habitname" value="{{habitname}}">
+    <input type="hidden" name="habitid" value="{{habitid}}">
+    <input type="hidden" name="habitscore" value="{{habitscore}}">
+    <label for="date">Date: </label>
+    <input type="date" id="date" name="date">
+    <label for="time">Time:</label>
+    <input type="time" id="time" name="time">
+    <input type="submit" class="search-button" value="Log Group Habit">
+</form>
+{{#if isError}}
+<p class="error">{{error}}</p>
+{{/if}}
