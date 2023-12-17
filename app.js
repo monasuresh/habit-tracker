@@ -163,7 +163,6 @@ app.use('/logout', (req, res, next) => {
   }
 });
 
-app.use('/habits/create-habit', (req, res, next) => {
 app.use('/groups', (req, res, next) => {
   console.log(`[${new Date().toUTCString()}]: ${req.method} ${req.originalUrl} (${req.session.user ? 'Authenticated User' : 'Non-Authenticated User'})`);
   // Redirect to login if not logged in
@@ -211,11 +210,13 @@ app.use('tracked-habits/view-habit-log', (req, res, next) => {
   }
 });
 
-    console.log("I am in challenges")
+
+app.use('/habits/create-habit', (req, res, next) => {
+  if (!req.session.user) {
+    res.redirect('/login');
+  } else {
     next();
   }
-  //console.log("I am out")
-  //next();
 });
 
 app.use('/individual', (req, res, next) => {
