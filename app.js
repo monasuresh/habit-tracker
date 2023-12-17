@@ -172,6 +172,7 @@ app.use('/habits/create-habit', (req, res, next) => {
     next();
   }
 });
+
 app.use('/groups', (req, res, next) => {
   console.log(`[${new Date().toUTCString()}]: ${req.method} ${req.originalUrl} (${req.session.user ? 'Authenticated User' : 'Non-Authenticated User'})`);
   // Redirect to login if not logged in
