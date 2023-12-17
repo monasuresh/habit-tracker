@@ -1,57 +1,64 @@
 <head>
-    <meta charset="UTF-8">
-    <title>Habit Tracker</title>
-    <link rel="stylesheet" href="/public/css/streakreport.styles.css">
+  <meta charset="UTF-8" />
+  <title>Habit Tracker</title>
+  <link rel="stylesheet" href="/public/css/streakreport.styles.css" />
 </head>
-<div class="buttons-container">
-    <a href="/tracked-habits/view-habit-log" class="submit-button">Log a Habit</a>
-        <a href="/habits/create-habit" class="submit-button">Manage Habits</a>
-        {{!-- <a href="/tracked-habits/view-all" class="submit-button">View All Logged Habits</a> --}}
-                <a href="/protected" class="submit-button">Home Page</a>
-
+<div class="button-div">
+  <a href="/protected" class="submit-button">Home Page</a>
+  <a href="/habits/create-habit" class="submit-button">Manage Habits</a>
+  <a href="/tracked-habits/view-habit-log" class="submit-button">Log a Habit</a>
+  <a href="/groups" class="submit-button">Manage Group</a>
+  <a href="/individual" class="submit-button">Individual Challenge</a>
+  <a href="/challenges" class="submit-button">Challenge Dashboard</a>
+  <a href="/leadershipboard" class="submit-button">Leadership board</a>
 </div>
 <div class="streaks-report">
-    <h2>Streaks Report</h2>
-    <p>Hello {{userFirstName}}</p>
-    
-    {{#if badHabits.length}}
+  <h2>Streaks Report</h2>
+  <p>Hello {{userFirstName}}</p>
+
+  {{#if badHabits.length}}
     <h3>Streaks (bad):</h3>
     <table>
+      <tr>
+        <th>Habit</th>
+        <th>Count</th>
+        <th>Status</th>
+      </tr>
+      {{#each badHabits}}
         <tr>
-            <th>Habit</th>
-            <th>Count</th>
-            <th>Status</th>
+          <td>{{this.habitName}}</td>
+          <td>7</td>
+          <!-- Replace with dynamic count if available -->
+          <td
+            class="streak-status {{this.streakStatus}}"
+          >{{this.streakStatus}}</td>
         </tr>
-        {{#each badHabits}}
-        <tr>
-            <td>{{this.habitName}}</td>
-            <td>7</td> <!-- Replace with dynamic count if available -->
-            <td class="streak-status {{this.streakStatus}}">{{this.streakStatus}}</td>
-        </tr>
-        {{/each}}
+      {{/each}}
     </table>
-    {{else}}
+  {{else}}
     <p>No bad habits recorded.</p>
-    {{/if}}
+  {{/if}}
 
-    {{#if goodHabits.length}}
+  {{#if goodHabits.length}}
     <h3>Streaks (good):</h3>
     <table>
+      <tr>
+        <th>Habit</th>
+        <th>Count</th>
+        <th>Status</th>
+      </tr>
+      {{#each goodHabits}}
         <tr>
-            <th>Habit</th>
-            <th>Count</th>
-            <th>Status</th>
+          <td>{{this.habitName}}</td>
+          <td>7</td>
+          <!-- Replace with dynamic count if available -->
+          <td
+            class="streak-status {{this.streakStatus}}"
+          >{{this.streakStatus}}</td>
         </tr>
-        {{#each goodHabits}}
-        <tr>
-            <td>{{this.habitName}}</td>
-            <td>7</td> <!-- Replace with dynamic count if available -->
-            <td class="streak-status {{this.streakStatus}}">{{this.streakStatus}}</td>
-        </tr>
-        {{/each}}
+      {{/each}}
     </table>
-    {{else}}
+  {{else}}
     <p>No good habits recorded.</p>
-    {{/if}}
+  {{/if}}
 </div>
-

@@ -3,10 +3,24 @@
 individual handelbars
 
 --}}
+<head>
+    <meta charset="utf-8">
+    {{!-- <title>Habit Tracker</title> --}}
+    <link rel="stylesheet" href="/public/css/individual.styles.css">
+
+</head>
 <header>
     <h1>Habit Tracker - Add individual challenges</h1>
 </header>
-
+<div class="button-div">
+  <a href="/protected" class="submit-button">Home Page</a>
+  <a href="/habits/create-habit" class="submit-button">Manage Habits</a>
+  <a href="/tracked-habits/view-habit-log" class="submit-button">Log a Habit</a>
+  <a href="/groups" class="submit-button">Manage Group</a>
+  {{!-- <a href="/individual" class="submit-button">Individual Challenge</a> --}}
+  <a href="/challenges" class="submit-button">Challenge Dashboard</a>
+  <a href="/leadershipboard" class="submit-button">Leadership board</a>
+</div>
 <main>
     <form action="/individual" id="individual-form" method="POST">
         <div>

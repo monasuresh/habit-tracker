@@ -83,3 +83,9 @@ a.button {
     padding: 0 10px;
     color: #333; /* or any color you want */
 }
+.button-div {
+    display: flex;
+    justify-content: center; /* Horizontally center the content */
+    flex-wrap: wrap; /* Allow the items to wrap if necessary */
+    gap: 10px; /* Optional: Adds space between the buttons */
+}

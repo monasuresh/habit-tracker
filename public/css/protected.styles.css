@@ -13,12 +13,19 @@ body {
 
 /* Header */
 header {
-    background: #fff;
+    background-color: #007bff;
     color: #333;
     padding: 10px 0;
     text-align: center;
     border-bottom: 2px solid #333;
 }
+.welcome-message {
+    font-size: 18px; /* Example: Set font size */
+    color: #333; /* Example: Set text color */
+    margin: 10px 0; /* Example: Set margin */
+    line-height: 1.5; /* Example: Set line height for better readability */
+}
+
 
 /* Navigation Links */
 nav a {

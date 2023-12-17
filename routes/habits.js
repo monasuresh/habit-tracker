@@ -146,7 +146,7 @@ router
 
     });
 
-router
+    router
     .route('/log-habit')
     .get(async (req, res) => {
         try {
