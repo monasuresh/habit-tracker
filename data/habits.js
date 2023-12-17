@@ -1,4 +1,4 @@
-import { habits } from '../config/mongoCollections.js';
+import { habits, groups, individual } from '../config/mongoCollections.js';
 import { users } from '../config/mongoCollections.js';
 import { ObjectId } from 'mongodb';
 import validation from '../validation.js';
@@ -128,13 +128,30 @@ const modifyHabit = async (habitId, habitInfo) => {
     }
 
     const habitCollection = await habits();
+    const groupCollection = await groups();
+    const IndividualCollection = await individual();
+
     const updateInfo = await habitCollection.findOneAndUpdate(
         { _id: new ObjectId(habitId) },
         { $set: updatedHabit }
     );
 
-    if (!updateInfo)
+
+
+    if (updateInfo) {
+        const updateGroup = await groupCollection.findOneAndUpdate(
+            { habit: new ObjectId(habitId) },
+            { $set: updatedGoroup }
+        )
+        const updateIndividual = await IndividualCollection.findOneAndUpdate(
+            { habit: new ObjectId(habitId) },
+            { $set: updatedGoroup }
+        )
+    }
+    else {
         throw 'Update failed, could not find the requested habit.';
+    }
+
 
     return updateInfo;
 }

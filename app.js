@@ -164,6 +164,14 @@ app.use('/logout', (req, res, next) => {
 });
 
 app.use('/habits/create-habit', (req, res, next) => {
+  console.log(`[${new Date().toUTCString()}]: ${req.method} ${req.originalUrl} (${req.session.user ? 'Authenticated User' : 'Non-Authenticated User'})`);
+  // Redirect to login if not logged in
+  if (!req.session.user) {
+    res.redirect('/login');
+  } else {
+    next();
+  }
+});
 app.use('/groups', (req, res, next) => {
   console.log(`[${new Date().toUTCString()}]: ${req.method} ${req.originalUrl} (${req.session.user ? 'Authenticated User' : 'Non-Authenticated User'})`);
   // Redirect to login if not logged in
@@ -174,8 +182,6 @@ app.use('/groups', (req, res, next) => {
     console.log("I am in next group")
     next();
   }
-  //console.log("I am out")
-  //next();
 });
 
 app.use('/users', (req, res, next) => {
@@ -188,8 +194,6 @@ app.use('/users', (req, res, next) => {
     console.log("I am in next user")
     next();
   }
-  //console.log("I am out")
-  //next();
 });
 
 app.use('/challenges', (req, res, next) => {
@@ -211,25 +215,14 @@ app.use('tracked-habits/view-habit-log', (req, res, next) => {
   }
 });
 
-    console.log("I am in challenges")
-    next();
-  }
-  //console.log("I am out")
-  //next();
-});
-
 app.use('/individual', (req, res, next) => {
   console.log(`[${new Date().toUTCString()}]: ${req.method} ${req.originalUrl} (${req.session.user ? 'Authenticated User' : 'Non-Authenticated User'})`);
   // Redirect to login if not logged in
-  console.log("I am in individual");
   if (!req.session.user) {
     res.redirect('/login');
   } else {
-    console.log("I am in next individual")
     next();
   }
-  //console.log("I am out")
-  //next();
 });
 
 
