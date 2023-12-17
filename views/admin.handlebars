@@ -1,16 +1,18 @@
-{{!--
-
-If the user is logged in and they are an admin user, and 'GET /admin' endpoint is called, you will render this view
-based on the specs.
-
-
-
---}}
-<header>        
-    <h1>Habit Tracker - Admin</h1>
-</header>
-<p>Welcome {{firstName}} {{lastName}}, the time is now: {{currentTime}}. You get super secret admin access since you are an admin. Remember, with great power comes great responsibility!! </p>
-<p>Click <a href="/protected">here</a> to go to Protected page</p>
-<p>To create group click here!</p> <a href="/groups">Add Group</a> 
-<p>To create individual challenge click here!</p> <a href="/individual">Add Individual Challenge</a> 
-<p><a href="/logout">Logout</a></p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Habit Tracker - Admin</title>
+    <!-- Add relevant CSS and JavaScript links here -->
+</head>
+<body>
+    <header>        
+        <h1>Habit Tracker - Admin</h1>
+    </header>
+    <p>Welcome {{firstName}} {{lastName}}, the time is now: {{currentTime}}. You get super secret admin access since you are an admin. Remember, with great power comes great responsibility!!</p>
+    <p>Click <a href="/protected">here</a> to go to the Protected page.</p>
+    <p><a href="/groups">To create a group click here!</a></p>
+    <p><a href="/individual">To create an individual challenge click here!</a></p>
+    <p><a href="/logout">Logout</a></p>
+</body>
+</html>
