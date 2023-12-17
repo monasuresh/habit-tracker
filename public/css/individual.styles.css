@@ -84,6 +84,7 @@ select {
 
 /* General button styling */
 .button-div {
+    margin-top:10px ;
     display: flex;
     justify-content: center; /* Horizontally center the content */
     flex-wrap: wrap; /* Allow the items to wrap if necessary */

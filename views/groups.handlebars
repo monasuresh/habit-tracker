@@ -21,11 +21,11 @@ groups handelbars
   <a href="/challenges" class="submit-button">Challenge Dashboard</a>
   <a href="/leadershipboard" class="submit-button">Leadership board</a>
 </div>
- <main>
-        <form action="/individual" id="individual-form" method="POST">
+<main>
+        <form action="/groups" id="groups-form" method="POST">
             <div class="form-group">
-                <label for="challengeNameInput">Challenge Name:</label>
-                <input type="text" id="challengeNameInput" name="challengeNameInput" placeholder="Enter Your Challenge Name">
+                <label for="groupNameInput">Group Name:</label>
+                <input type="text" id="groupNameInput" name="groupNameInput" placeholder="Enter Your Group Name">
             </div>
             <div class="form-group">
                 <label for="habitInput">Select Habit:</label>
@@ -42,7 +42,13 @@ groups handelbars
                 <input type="date" id="enddateInput" name="enddateInput">
             </div>
             <div class="form-group">
-                <button type="submit" class="submitBtn" name="submitBtn">Add Individual Challenge</button>
+                <label for="userInput">Select Participant:</label>
+                <select id="userInput" name="userInput">
+                    <!-- Participant options will be inserted here -->
+                </select>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="submitBtn" name="submitBtn">Add Group</button>
             </div>
             <div id="error">
                 <p>{{error}}</p>
