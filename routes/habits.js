@@ -3,9 +3,8 @@ import express from 'express';
 import { trackedHabitData } from '../data/index.js';
 import { habitLogData } from '../data/index.js';
 import validation from '../validation.js';
-import { habits } from '../config/mongoCollections.js';
+import { habits,users } from '../config/mongoCollections.js';
 import { ObjectId } from 'mongodb';
-
 const router = express.Router();
 
 router
@@ -120,7 +119,7 @@ router
     .get(async (req, res) => {
         try {
             const habitList = await habitData.getAllHabits();
-            console.log("I am in view all")
+            // console.log("I am in view all")
             return res.json(habitList);
         } catch (e) {
             return res.status(500).send(e);
@@ -357,4 +356,17 @@ router
         res.redirect('/challenges'); // Redirect to a success page or handle it as needed
     });
 
+    router.route('/streak-report').get(async (req, res) => {
+        try {
+            const userId = req.query.userId; // Fetch userId from query parameter
+            const userCollection = await users();
+            const user = await userCollection.findOne({ _id: new ObjectId(userId) });
+            const streakReport = await habitLogData.getStreakReport(userId);
+            // Assuming you're passing the data to the streak-report-template.hbs
+            // console.log("streakReport",streakReport)
+            res.render('streak-report-template', { userFirstName: user.firstName, ...streakReport  });
+        } catch (e) {
+            return res.status(500).json({ error: `Error fetching streak report: ${e}` });
+        }
+    });
 export default router;
