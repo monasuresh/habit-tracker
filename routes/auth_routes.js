@@ -59,7 +59,7 @@ router
     }
   });
 
-router
+  router
   .route('/login')
   .get(async (req, res) => {
     res.render('login');
@@ -94,11 +94,13 @@ router
         //console.log('Login POST - user: '+user.emailAddress);
         if (user.emailAddress === emailAddress) {
           //console.log('Login POST - email: '+emailAddress+' MATCHES!!!');
-          req.session.user = { id: user._id, firstName: user.firstName, lastName: user.lastName, emailAddress: user.emailAddress, role: user.role };
+          // console.log("user after login", user)
+          req.session.user = { firstName: user.firstName, lastName: user.lastName, emailAddress: user.emailAddress, role: user.role, userId:user._id.toString(),_id:user._id};
           if (user.role === "admin") {
-            res.redirect('/admin');
+            res.render('admin',  req.session.user );
           } else {
-            res.redirect('/protected');
+            console.log("req.session.user", req.session.user)
+            res.render('protected', req.session.user );
           }
         }
       } catch (e) {
@@ -110,16 +112,25 @@ router
     }
   });
 
-router.route('/protected').get(async (req, res) => {
-  try {
-    const currentTime = new Date();
-    let isAdmin = req.session.user.role === 'admin';
-    const habitItems = await habitData.getAllHabits();
-    return res.render('protected', { title: 'User Page', firstName: req.session.user.firstName, lastName: req.session.user.lastName, currentTime: currentTime, role: req.session.user.role, isAdmin: isAdmin, habitItems: habitItems });
-  } catch (e) {
-    return res.status(500).render('error', { message: 'Internal Server Error' });
+  router.route('/protected').get(async (req, res) => {
+    try {
+      const currentTime = formatDateToDDMMYYYY(new Date());
+      let isAdmin = req.session.user.role === 'admin';
+      const habitItems = await habitData.getAllHabits();
+      // console.log("habitItems",{ title: 'User Page', firstName: req.session.user.firstName, lastName: req.session.user.lastName, currentTime: currentTime, role: req.session.user.role, isAdmin: isAdmin, habitItems: habitItems,userId:req.session.user._id })
+      return res.render('protected', { title: 'User Page', firstName: req.session.user.firstName, lastName: req.session.user.lastName, currentTime: currentTime, role: req.session.user.role, isAdmin: isAdmin, habitItems: habitItems,userId: req.session.user._id.toString() });
+    } catch (e) {
+      return res.status(500).render('error', { message: 'Internal Server Error' });
+    }
+  });
+  
+  function formatDateToDDMMYYYY(date) {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // January is 0!
+    const year = date.getFullYear();
+  
+    return `${day}.${month}.${year}`;
   }
-});
 
 router.route('/protected').post(async (req, res) => {
   let isError = false;

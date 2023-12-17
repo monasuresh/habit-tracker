@@ -1,6 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { users, groups, individual } from '../config/mongoCollections.js';
-import { habits } from '../config/mongoCollections.js';
+import { users, groups, individual,habits } from '../config/mongoCollections.js';
 import validation from '../validation.js';
 
 const logHabit = async (emailAddress, trackedHabitName, date, time) => {
@@ -365,10 +364,74 @@ const postLogHabitsForIndividualChallenge = async (emailAddress, habitname, habi
 
 };
 
+const getStreakReport = async (userId) => {
+    if (!userId) throw "User ID is required";
+  
+    const userCollection = await users();
+    const habitsCollection = await habits();
+  
+    const user = await userCollection.findOne({ _id: new ObjectId(userId) });
+    if (!user) throw `User with ID ${userId} not found`;
+  
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    console.log(`Today's date for comparison: ${today.toISOString()}`);
+  
+    let streaksReport = {
+      goodHabits: [],
+      badHabits: []
+    };
+  
+    for (const trackedHabit of user.trackedHabits) {
+      const habit = await habitsCollection.findOne({ _id: trackedHabit.habitId });
+      const logs = user.habitLog.filter(log => log.trackedHabitID.equals(trackedHabit._id));
+  
+      let streakStatus = 'completed';
+      console.log(`Evaluating habit: ${habit.name}`);
+  
+      for (let i = 0; i < 7; i++) {
+        const checkDate = new Date(today);
+        checkDate.setDate(today.getDate() - i);
+  
+        const formattedCheckDate = `${checkDate.getFullYear()}-${(checkDate.getMonth() + 1).toString().padStart(2, '0')}-${checkDate.getDate().toString().padStart(2, '0')}`;
+        console.log(`Checking date: ${formattedCheckDate}`);
+  
+        let dayHasLog = logs.some(log => {
+          const logDate = new Date(`${log.date}T${log.time}`);
+          const formattedLogDate = `${logDate.getFullYear()}-${(logDate.getMonth() + 1).toString().padStart(2, '0')}-${logDate.getDate().toString().padStart(2, '0')}`;
+          return formattedLogDate === formattedCheckDate;
+        });
+  
+        console.log(`Log found for date ${formattedCheckDate}: ${dayHasLog}`);
+        if (!dayHasLog) {
+          streakStatus = 'broken';
+          console.log(`Streak broken on: ${formattedCheckDate}`);
+          break;
+        }
+      }
+  
+      const streakData = {
+        habitName: habit.name,
+        streakStatus: streakStatus
+      };
+  
+      if (habit.effect === 'good') {
+        streaksReport.goodHabits.push(streakData);
+      } else {
+        streaksReport.badHabits.push(streakData);
+      }
+    }
+  
+    console.log(`Streaks Report:`, streaksReport);
+    return streaksReport;
+  };
+  
+  
 export default {
     logHabit,
     getAllHabitLogEntries,
     getHabitLogEntryById,
+    getStreakReport,
     postAllTrackedHabitsWithId,
     postLogHabitsForIndividualChallenge
 };

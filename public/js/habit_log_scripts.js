@@ -101,39 +101,55 @@ function displayHabitLogError(message) {
     }, 5000);
 }
 
-function addHabitEntry(validHabitLogParams) {
-    let name = validHabitLogParams.name;
-    let date = validHabitLogParams.date;
-    let time = validHabitLogParams.time;
-    // Make an AJAX POST request
+function addHabitEntry() {
+    const habitInput = document.getElementById('habitInput');
+    const dateInput = document.getElementById('dateInput');
+    const timeInput = document.getElementById('timeInput');
+
+    // Log the input values for debugging
+    console.log('Habit:', habitInput.value);
+    console.log('Date:', dateInput.value);
+    console.log('Time:', timeInput.value);
+
+    const name = habitInput.value.trim();
+    const date = dateInput.value.trim();
+    const time = timeInput.value.trim();
+    const emailAddress = localStorage.getItem('emailAddress').trim();
+
+    // Log the trimmed values
+    console.log(`Trimmed Habit Name: ${name}`);
+    console.log(`Trimmed Date: ${date}`);
+    console.log(`Trimmed Time: ${time}`);
+    console.log(`Email Address from Storage: ${emailAddress}`);
+
+    const habitLogEntry = {
+        habitNameInput: name,
+        dateInput: date, // local date
+        timeInput: time, // local time
+        timestamp: new Date(`${date}T${time}`).toISOString() // UTC timestamp
+    };
+    
+
+    // Log the habit log entry object to be sent
+    console.log('Habit Log Entry:', habitLogEntry);
+
+    // AJAX request to log the habit
     $.ajax({
         type: 'POST',
         url: '/habits/log-habit',
         contentType: 'application/json',
         data: JSON.stringify({
-            habitNameInput: name,
-            dateInput: date,
-            timeInput: time,
+            emailAddress: emailAddress,
+            ...habitLogEntry,
         }),
-    }).then(
-        function (response) {
-            // Success callback
+        success: function (response) {
             console.log('Habit entry added successfully:', response);
-            const dateTime = `${date}T${time}`;
-            habitLogData.push({ name, dateTime });
-
-            datePicker.value = date;
-
-            const changeEvent = new Event('change');
-            datePicker.dispatchEvent(changeEvent);
+            // Update the UI here if necessary
         },
-        function (jqXHR, textStatus, errorThrown) {
-            // Error callback
-            // Handle error response
-            let errorMessage = jqXHR.responseJSON.error;
-            displayHabitLogError(errorMessage);
-        }
-    );
+        error: function (xhr, status, error) {
+            console.error('Error adding habit entry:', error);
+        },
+    });
 }
 
 function populateHabitLogData() {
