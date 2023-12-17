@@ -203,9 +203,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     if (window.location.pathname === '/groups' || window.location.pathname === '/individual') {
       const response_habit = await fetch('/habits/view-all');
-      console.log("checking for habits:", response_habit);
       const habitsData = await response_habit.json();
-      console.log(habitsData);
 
       const selectElementHabit = document.getElementById('habitInput');
 
@@ -340,91 +338,95 @@ function showDropdown(groupId) {
 }
 
 document.addEventListener('DOMContentLoaded', async function () {
-  try {
-    // Fetch group data from your server
-    const response = await fetch('/groups/groups-all');
-    const groupData = await response.json();
+  if (window.location.pathname === '/leadershipboard')
+  {
+    try {
+      // Fetch group data from your server
+      const response = await fetch('/groups/groups-all');
+      const groupData = await response.json();
+      console.log(groupData);
 
-    // Iterate over each group and create a bar chart
-    groupData.forEach(group => {
-      // Create a container div for each group
-      const groupContainer = document.createElement('div');
-      groupContainer.className = 'group-container';
+      // Iterate over each group and create a bar chart
+      groupData.forEach(group => {
+        // Create a container div for each group
+        const groupContainer = document.createElement('div');
+        groupContainer.className = 'group-container';
 
-      // Get the canvas element for the chart
-      const canvasId = `barChart_${group.groupId}`;
-      const ctx = document.getElementById(canvasId).getContext('2d');
+        // Get the canvas element for the chart
+        const canvasId = `barChart_${group.groupId}`;
+        const ctx = document.getElementById(canvasId).getContext('2d');
 
-      const labels = group.users.map(user => `User ${user.userName}`);
-      const scores = group.users.map(user => user.userScore);
+        const labels = group.users.map(user => `User ${user.userName}`);
+        const scores = group.users.map(user => user.userScore);
 
-      const chartData = {
-        labels: labels,
-        datasets: [{
-          label: 'Scores',
-          data: scores,
-          backgroundColor: [
-            'rgba(255, 99, 132, 0.2)',
-            'rgba(54, 162, 235, 0.2)',
-            'rgba(255, 206, 86, 0.2)',
-          ],
-          borderColor: [
-            'rgba(255, 99, 132, 1)',
-            'rgba(54, 162, 235, 1)',
-            'rgba(255, 206, 86, 1)',
-          ],
-          borderWidth: 1,
-        }],
-      };
+        const chartData = {
+          labels: labels,
+          datasets: [{
+            label: 'Scores',
+            data: scores,
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.2)',
+              'rgba(54, 162, 235, 0.2)',
+              'rgba(255, 206, 86, 0.2)',
+            ],
+            borderColor: [
+              'rgba(255, 99, 132, 1)',
+              'rgba(54, 162, 235, 1)',
+              'rgba(255, 206, 86, 1)',
+            ],
+            borderWidth: 1,
+          }],
+        };
 
-      // Create a new Chart.js instance for each chart
-      const myBarChart = new Chart(ctx, {
-        type: 'bar',
-        data: chartData,
-        title: 'Group CHart',
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true,
+        // Create a new Chart.js instance for each chart
+        const myBarChart = new Chart(ctx, {
+          type: 'bar',
+          data: chartData,
+          title: 'Group CHart',
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true,
+              },
+            },
+            plugins: {
+              legend: {
+                display: false, // Hide legend
+              },
+            },
+            animation: {
+              onComplete: function () {
+                const chartInstance = this.chart;
+                const ctx = chartInstance.ctx;
+                const fontColor = 'black';
+                ctx.font = Chart.helpers.fontString(14, 'normal', Chart.defaults.font.family);
+                ctx.textAlign = 'center';
+
+                group.users.forEach((user, index) => {
+                  const text = `${user.userName}`;
+                  const textX = chartInstance.scales.x.getPixelForValue(index);
+                  const textY = chartInstance.scales.y.getPixelForValue(user.userScore) - 5;
+                  ctx.fillStyle = fontColor;
+                  ctx.fillText(text, textX, textY);
+                });
+              }
             },
           },
-          plugins: {
-            legend: {
-              display: false, // Hide legend
-            },
-          },
-          animation: {
-            onComplete: function () {
-              const chartInstance = this.chart;
-              const ctx = chartInstance.ctx;
-              const fontColor = 'black';
-              ctx.font = Chart.helpers.fontString(14, 'normal', Chart.defaults.font.family);
-              ctx.textAlign = 'center';
+        });
 
-              group.users.forEach((user, index) => {
-                const text = `${user.userName}`;
-                const textX = chartInstance.scales.x.getPixelForValue(index);
-                const textY = chartInstance.scales.y.getPixelForValue(user.userScore) - 5;
-                ctx.fillStyle = fontColor;
-                ctx.fillText(text, textX, textY);
-              });
-            }
-          },
-        },
+        // Display winner's name above the chart using an external label
+        const winnerLabel = document.createElement('div');
+        winnerLabel.innerHTML = `<strong>Winner: ${group.groupName} - ${group.winner.userName}</strong>`;
+        winnerLabel.style.textAlign = 'center';
+        winnerLabel.style.marginTop = '10px';
+        groupContainer.appendChild(winnerLabel);
+        groupContainer.appendChild(document.getElementById(canvasId).parentNode);
+
+        // Append the container to the document body or another suitable parent element
+        document.body.appendChild(groupContainer);
       });
-
-      // Display winner's name above the chart using an external label
-      const winnerLabel = document.createElement('div');
-      winnerLabel.innerHTML = `<strong>Winner: ${group.groupName} - ${group.winner.userName}</strong>`;
-      winnerLabel.style.textAlign = 'center';
-      winnerLabel.style.marginTop = '10px';
-      groupContainer.appendChild(winnerLabel);
-      groupContainer.appendChild(document.getElementById(canvasId).parentNode);
-
-      // Append the container to the document body or another suitable parent element
-      document.body.appendChild(groupContainer);
-    });
-  } catch (error) {
-    console.error('Error fetching group data:', error);
+    } catch (error) {
+      console.error('Error fetching group data:', error);
+    }
   }
 });

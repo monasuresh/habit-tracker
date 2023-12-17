@@ -69,17 +69,17 @@ router.route('/track/:habitId').post(async (req, res) => {
     try {
         habitId = validation.validateIdStrings(habitId);
     } catch (error) {
-        return res.status(400).json({error: error});
+        return res.status(400).json({ error: error });
     }
 
     if (!emailAddress) {
-        return res.status(404).json({error: 'User has not been registered with an email address.'});
+        return res.status(404).json({ error: 'User has not been registered with an email address.' });
     }
 
     try {
         emailAddress = validation.validateEmailAddress(emailAddress);
     } catch (error) {
-        return res.status(400).json({error: error});
+        return res.status(400).json({ error: error });
     }
 
     let time;
@@ -87,7 +87,7 @@ router.route('/track/:habitId').post(async (req, res) => {
     try {
         time = validation.isValidTime24HourFormat(habitDocument.reminderTimeInput);
     } catch (error) {
-        res.status(400).json({error: error});
+        res.status(400).json({ error: error });
     }
 
     // Check to see if there is a user with the specified email address. If not, throw an error.
@@ -95,7 +95,7 @@ router.route('/track/:habitId').post(async (req, res) => {
     try {
         await validation.checkIfEmailAddressExistsInDb(emailAddress);
     } catch (error) {
-        res.status(404).json({error: error});
+        res.status(404).json({ error: error });
     }
 
     const habitCollection = await habits();
@@ -103,7 +103,7 @@ router.route('/track/:habitId').post(async (req, res) => {
     let habit = await habitCollection.findOne({ _id: new ObjectId(habitId) });
 
     if (!habit) {
-        return res.status(404).json({error: 'The habit you are trying to track could not be found'});
+        return res.status(404).json({ error: 'The habit you are trying to track could not be found' });
     }
 
     try {
@@ -134,15 +134,15 @@ router
 
         try {
             deletionId = validation.validateIdStrings(deletionId);
-        } catch (error) {
-            return res.status(400).json({ error: error });
+        } catch (e) {
+            return res.status(400).json({ error: e });
         }
 
         try {
             const deletedHabit = await habitData.deleteHabit(deletionId);
             return res.json(deletedHabit);
-        } catch (error) {
-            return res.status(404).json({ error: error });
+        } catch (e) {
+            return res.status(404).json({ error: e });
         }
 
     });
@@ -314,19 +314,13 @@ router
             await habitLogData.postAllTrackedHabitsWithId(req.session.user.emailAddress, habitDocument.habitname, habitDocument.habitid, habitDocument.date, habitDocument.time, habitDocument.habitscore);
 
             console.log("habit id:", habitDocument.habitid);
-
-            //let habitlist = await habitData.getHabitById(habitDocument.habitid);
-
-            //await habitLogData.postScore(req.session.user.emailAddress, habitlist.weight, habitlist.name)
-            // Log the habit based on the habitid parameter
-            // Adjust the arguments based on your logHabit function requirements
         } catch (e) {
             return res
                 .status(400)
-                .render('protected', { title: 'Habit track Page', message: 'One or more inputs are incorrect.', isError: isError });
+                .render('protected', { title: 'Habit track Page', message: 'One or more inputs are incorrect.', error: e });
         }
         // Handle the success case
-        res.redirect('/success'); // Redirect to a success page or handle it as needed
+        res.redirect('/challenges'); // Redirect to a success page or handle it as needed
     });
 
 router
@@ -357,10 +351,10 @@ router
         } catch (e) {
             return res
                 .status(400)
-                .render('protected', { title: 'Individual Page', message: 'One or more inputs are incorrect.', isError: isError });
+                .render('protected', { title: 'Individual Page', message: 'One or more inputs are incorrect.', error: e });
         }
         // Handle the success case
-        res.redirect('/success'); // Redirect to a success page or handle it as needed
+        res.redirect('/challenges'); // Redirect to a success page or handle it as needed
     });
 
 export default router;

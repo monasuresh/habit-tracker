@@ -21,9 +21,7 @@ const constructorMethod = (app) => {
   app.use('/habits', habitRoutes);
   app.use('/tracked-habits', trackedHabitRoutes);
  
-  console.log("I am in index route")
   app.use('/groups', groupRoutes);
-  console.log("I am going in groups")
   app.use('/users', userRoutes);
   app.use('/challenges', challangeRoutes);
   app.use('/individual', individualRoutes);

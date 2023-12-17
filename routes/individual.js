@@ -5,7 +5,7 @@ import individualData from '../data/individual.js';
 import validation from '../validation.js';
 
 router.get('/', async (req, res) => {
-  res.render('individual');
+  res.render('individual',{title:'Individual board'});
 });
 
 router.post('/', async (req, res) => {

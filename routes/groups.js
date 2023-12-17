@@ -5,7 +5,7 @@ import groupData from '../data/group.js';
 import validation from '../validation.js';
 
 router.get('/', async (req, res) => {
-  res.render('groups');
+  res.render('groups', { title: 'Group board' });
 });
 
 router.post('/', async (req, res) => {
@@ -23,7 +23,6 @@ router.post('/', async (req, res) => {
     const group = await groupData.addGroups(groupName, habit, startdateInput, enddateInput, userInput, req.session.user.id);
 
     if (group.insertedGroup === true) {
-      console.log("Inserted!!!!!!!!!");
       res.status(200).redirect('/challenges');
     }
   } catch (e) {
@@ -81,9 +80,8 @@ router.get('/groups-all', async (req, res) => {
     const groupUser = await groupData.getGroupUserData();
     return res.json(groupUser);
 
-  } catch (error) {
-    console.error('Error fetching user data:', error.message);
-    res.status(500).json({ error: 'Internal Server Error' });
+  } catch (e) {
+    res.status(500).json({ error: e });
   }
 });
 

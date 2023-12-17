@@ -25,7 +25,6 @@ const exportedMethods = {
 
     if (userId && existingUser.individualhabitlog) {
       const habitIndex = existingUser.individualhabitlog.findIndex(entry => entry.habitname === existingHabit.name);
-      console.log(habitIndex);
       if (habitIndex > -1) throw 'You are already part of this habit for one of the individual challenge'
     }
     if (userId === existingUser.userId) throw 'User already exist in challenge';
@@ -75,7 +74,6 @@ const exportedMethods = {
     validation.checkOnlyId(id);
     const individualCollection = await individual();
     const individuals = await individualCollection.findOne({ _id: new ObjectId(id) });
-    console.log("Individual list:", individuals);
     if (!individuals) throw 'Error: Individual not found';
 
     return individuals;

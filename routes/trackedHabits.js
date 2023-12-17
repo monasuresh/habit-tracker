@@ -1,7 +1,5 @@
-import { habitData } from '../data/index.js';
 import express from 'express';
 import { trackedHabitData } from '../data/index.js';
-import { habitLogData } from '../data/index.js';
 import validation from '../validation.js';
 import { users } from '../config/mongoCollections.js';
 import { ObjectId } from 'mongodb';

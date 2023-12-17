@@ -31,7 +31,7 @@ function renderItems() {
 }
 
 function openModifyItemModal(itemId) {
-    const item = items.find(i => i.id === itemId);
+    item = items.find(i => i.id === itemId);
 
     const modifyItemForm = document.getElementById('modifyItemForm');
 

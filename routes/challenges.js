@@ -37,7 +37,7 @@ router.get('/', async (req, res) => {
             }
         }
 
-        return res.status(200).render('challenges', { groupDataRet: group, individualDataRet: individuals, habitDataRet: habitDatalist, user: userData });
+        return res.status(200).render('challenges', { title: 'Challenges board', groupDataRet: group, individualDataRet: individuals, habitDataRet: habitDatalist, user: userData });
     } catch (e) {
         return res.status(404).json({ error: e });
     }

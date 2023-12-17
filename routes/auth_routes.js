@@ -110,12 +110,6 @@ router
     }
   });
 
-/*router.route('/protected').get(async (req, res) => {
-  var currentdate = new Date();
-  var currentTime = currentdate.getHours() + ":" + currentdate.getMinutes() + ":" + currentdate.getSeconds();
-  res.render('protected',{firstName: req.session.user.firstName, lastName: req.session.user.lastName, currentTime: currentTime, role: req.session.user.role});
-}); */
-
 router.route('/protected').get(async (req, res) => {
   try {
     const currentTime = new Date();

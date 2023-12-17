@@ -25,7 +25,6 @@ const exportedMethods = {
 
     if (userId && existingUser.grouphabitlog) {
       const habitIndex = existingUser.grouphabitlog.findIndex(entry => entry.habitname === existingHabit.name);
-      console.log(habitIndex);
       if (habitIndex > -1) throw 'You are already part of this habit for one of the group'
     }
     if (!Array.isArray(participate)) {
@@ -74,7 +73,6 @@ const exportedMethods = {
         $elemMatch: { $eq: id }
       }
     }).toArray();
-    console.log("Group list:", group);
     if (!group) throw 'Error: Group not found';
     return group;
   },
@@ -263,10 +261,9 @@ const exportedMethods = {
           },
         });
       }
-      console.log(results);
       return results;
-    } catch (error) {
-      console.error('Error fetching group data:', error);
+    } catch (e) {
+      console.error('Error fetching group data:', e);
       throw new Error('Internal Server Error');
     }
   }
