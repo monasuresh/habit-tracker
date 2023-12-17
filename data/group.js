@@ -10,6 +10,7 @@ const exportedMethods = {
 
   async addGroups(groupname, habit, startdate, enddate, participate, userId) {
 
+    console.log("addGroups",groupname, habit, startdate, enddate, participate, userId)
     if (!groupname || !habit || !startdate || !enddate || !participate || !userId) {
       throw new Error('All the fields needs to be supplied');
     }

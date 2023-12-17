@@ -8,14 +8,14 @@ import validation from '../validation.js';
 
 router.get('/', async (req, res) => {
     try {
-        if (!req.session.user.id) throw 'Id must be there in session';
-        validation.checkOnlyId(req.session.user.id);
-        const group = await groupData.getGroupByUserId(req.session.user.id);
-        const individuals = await individualData.getIndividualByUserId(req.session.user.id);
+        if (!req.session.user._id) throw 'Id must be there in session';
+        validation.checkOnlyId(req.session.user._id);
+        const group = await groupData.getGroupByUserId(req.session.user._id);
+        const individuals = await individualData.getIndividualByUserId(req.session.user._id);
         let habitDatalist = [];
 
         const userData = {
-            id: req.session.user.id,
+            id: req.session.user._id,
         };
 
         for (const entry of group) {
