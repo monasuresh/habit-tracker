@@ -59,7 +59,7 @@ router
     }
   });
 
-router
+  router
   .route('/login')
   .get(async (req, res) => {
     res.render('login');
@@ -94,11 +94,13 @@ router
         //console.log('Login POST - user: '+user.emailAddress);
         if (user.emailAddress === emailAddress) {
           //console.log('Login POST - email: '+emailAddress+' MATCHES!!!');
-          req.session.user = { id: user._id, firstName: user.firstName, lastName: user.lastName, emailAddress: user.emailAddress, role: user.role };
+          // console.log("user after login", user)
+          req.session.user = { firstName: user.firstName, lastName: user.lastName, emailAddress: user.emailAddress, role: user.role, userId:user._id.toString(),_id:user._id};
           if (user.role === "admin") {
-            res.redirect('/admin');
+            res.render('admin',  req.session.user );
           } else {
-            res.redirect('/protected');
+            console.log("req.session.user", req.session.user)
+            res.render('protected', req.session.user );
           }
         }
       } catch (e) {

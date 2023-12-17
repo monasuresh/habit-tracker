@@ -82,6 +82,7 @@ const exportedMethods = {
     }
 
     // Return user information excluding the password
+    console.log("user",user)
     const { _id, firstName, lastName, emailAddress, role } = user;
     return { _id, firstName, lastName, emailAddress, role };
   },

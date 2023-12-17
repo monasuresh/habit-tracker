@@ -1,0 +1,66 @@
+/* Overall page styling */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #e7ecf0;
+    color: #2c3e50;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    text-align: center; /* Center align text for a modern look */
+}
+
+header {
+    background-color: #2980b9;
+    color: #fff;
+    padding: 20px 0;
+    border-radius: 6px;
+    margin-bottom: 40px; /* Space between header and content */
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5rem;
+}
+
+/* Paragraph styling */
+p {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+}
+
+/* Link styling */
+a {
+    display: inline-block;
+    color: #2980b9;
+    background-color: #fff;
+    padding: 10px 15px;
+    margin: 5px;
+    border-radius: 4px;
+    text-decoration: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+a:hover {
+    color: #fff;
+    background-color: #3498db;
+    text-decoration: none; /* No underline on hover */
+    transform: translateY(-2px); /* Slight lift on hover */
+}
+
+footer {
+    font-size: 0.9rem;
+    text-align: center;
+    color: #7f8c8d;
+    margin-top: 40px;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 2rem;
+    }
+    p {
+        font-size: 1rem;
+    }
+}

@@ -3,40 +3,48 @@
 groups handelbars
 
 --}}
+<head>
+    <meta charset="utf-8">
+    {{!-- <title>Habit Tracker</title> --}}
+    <link rel="stylesheet" href="/public/css/login.styles.css">
+
+</head>
 <header>
     <h1>Habit Tracker - Add Groups</h1>
 </header>
 
 <main>
-    <form action="/groups" id="groups-form" method="POST">
-        <div>
-            <label for="groupNameInput">Group Name:</label>
-            <input type="text" id="groupNameInput" name="groupNameInput" placeholder="Enter Your Group Name">
-        </div>
-        <div>
-            <label for="habitInput">Select Habit:</label>
-            <select id="habitInput" name="habitInput">
-            </select>
-        </div>
-        <div>
-            <label for="startdateInput">Start Date:</label>
-            <input type="date" id="startdateInput" name="startdateInput">
-        </div>
-        <div>
-            <label for="enddateInput">End Date:</label>
-            <input type="date" id="enddateInput" name="enddateInput">
-        </div>
-        <div>
-            <label for="userInput">Select Participate:</label>
-            <select id="userInput" name="userInput">
-            </select>
-        </div>
-        <div>
-            <button type="submit" class="submitBtn" name="submitBtn">Add Group</button>
-        </div>
-        <div id="error">
-            <p>{{error}}</p>
-        </div>
-    </form>
-</main>
+        <form action="/groups" id="groups-form" method="POST">
+            <div class="form-group">
+                <label for="groupNameInput">Group Name:</label>
+                <input type="text" id="groupNameInput" name="groupNameInput" placeholder="Enter Your Group Name">
+            </div>
+            <div class="form-group">
+                <label for="habitInput">Select Habit:</label>
+                <select id="habitInput" name="habitInput">
+                    <!-- Habit options will be inserted here -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="startdateInput">Start Date:</label>
+                <input type="date" id="startdateInput" name="startdateInput">
+            </div>
+            <div class="form-group">
+                <label for="enddateInput">End Date:</label>
+                <input type="date" id="enddateInput" name="enddateInput">
+            </div>
+            <div class="form-group">
+                <label for="userInput">Select Participant:</label>
+                <select id="userInput" name="userInput">
+                    <!-- Participant options will be inserted here -->
+                </select>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="submitBtn" name="submitBtn">Add Group</button>
+            </div>
+            <div id="error">
+                <p>{{error}}</p>
+            </div>
+        </form>
+    </main>
 
