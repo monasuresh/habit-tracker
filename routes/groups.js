@@ -17,10 +17,11 @@ router.post('/', async (req, res) => {
   }
   if (!groupNameInput || !habitInput || !startdateInput || !enddateInput || !userInput) throw 'All fields needs to be supplied';
 
+  console.log("req.session.user",req.session.user)
   try {
     const groupName = validation.checkGroupString(groupNameInput);
     const habit = validation.checkOnlyId(habitInput);
-    const group = await groupData.addGroups(groupName, habit, startdateInput, enddateInput, userInput, req.session.user.id);
+    const group = await groupData.addGroups(groupName, habit, startdateInput, enddateInput, userInput, req.session.user._id);
 
     if (group.insertedGroup === true) {
       res.status(200).redirect('/challenges');

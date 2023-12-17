@@ -18,7 +18,7 @@ router.post('/', async (req, res) => {
   try {
     const challengeName = validation.checkIndividualString(challengeNameInput);
     const habit = validation.checkOnlyId(habitInput);
-    const individual = await individualData.addIndividual(challengeName, habit, startdateInput, enddateInput, req.session.user.id);
+    const individual = await individualData.addIndividual(challengeName, habit, startdateInput, enddateInput, req.session.user._id);
 
     if (individual.insertedGroup === true) {
       res.status(200).redirect('/challenges');
