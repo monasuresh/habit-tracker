@@ -37,7 +37,7 @@ The application will be running at http://localhost:3000.
 
 5. Database:
 
-The dumb of the mongodb database can be found in the dump folder. You may use this to seed the database by running mongorestore /dump under the project directory.
+The dump of the mongodb database can be found in the dump folder. You may use this to seed the database by running mongorestore /dump under the project directory.
 
 
 ## Usage
