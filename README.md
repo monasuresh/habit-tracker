@@ -35,6 +35,10 @@ To set up the Habit Tracker app on your local machine, follow these steps:
     
 The application will be running at http://localhost:3000.
 
+5. Database:
+
+The dumb of the mongodb database can be found in the dump folder. You may use this to seed the database by running mongorestore /dump under the project directory.
+
 
 ## Usage
 After starting the server, navigate to http://localhost:3000 on your web browser to access the Habit Tracker application. Register for a new account or log in to start tracking your habits.
