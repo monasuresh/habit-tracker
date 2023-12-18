@@ -1,4 +1,4 @@
-const habitLogData = [];
+let habitLogData = [];
 
 function displayHabitEntries(date) {
     const habitLog = document.getElementById('habitLog');
